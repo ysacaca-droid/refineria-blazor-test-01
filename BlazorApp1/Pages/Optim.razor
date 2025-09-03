@@ -1,0 +1,127 @@
+﻿@page "/optim"
+@inject LogisticsOptimizer Optimizer
+@using BlazorApp1.Service
+@using Microsoft.AspNetCore.Components.Web
+
+<h3>Optimizador de Rutas Logísticas</h3>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="startLocation">Origen (Refinería)</label>
+            <select class="form-select" @bind="selectedStartLocation">
+                <option value="Todos">Todos</option>
+                <option value="Cochabamba">Cochabamba</option>
+                <option value="Santa Cruz">Santa Cruz</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="endLocation">Destino (Cliente)</label>
+            <select class="form-select" @bind="selectedDestination">
+                <option value="Todos">Todos</option>
+                @foreach (var client in allClients)
+                {
+                    <option value="@client">@client</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="quantity">Cantidad Total (m³)</label>
+            <input type="number" class="form-control" @bind="productQuantity" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary" @onclick="CalculateSchedule">Generar Programa de Envíos</button>
+</div>
+
+@if (schedule != null && schedule.Any())
+{
+    <h4 class="mt-4">Programa de Envíos Optimizado</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha de Envío</th>
+                <th>Ruta</th>
+                <th>Método de Transporte</th>
+                <th>Volumen de Envío (m³)</th>
+                <th>Costo de Viaje (USD)</th>
+                @* <th>Tiempo de Viaje (Horas)</th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var trip in paginatedSchedule)
+            {
+                <tr>
+                    <td>@trip.ShipmentDate.ToShortDateString()</td>
+                    <td>@trip.RouteName</td>
+                    <td>@trip.Method.ToString()</td>
+                    <td>@trip.VolumeAssignedM3.ToString("N0")</td>
+                    <td>@trip.TripCostUSD.ToString("N2")</td>
+                    @* <td>@trip.TripTimeHours.ToString("N0")</td> *@
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">**Total**</td>
+                <td>**@schedule.Sum(t => t.TripCostUSD).ToString("N2")**</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" @onclick="@(() => ChangePage(currentPage - 1))">Anterior</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                var pageNumber = i;
+                <li class="page-item @(currentPage == pageNumber ? "active" : "")">
+                    <a class="page-link" @onclick="@(() => ChangePage(pageNumber))">@pageNumber</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" @onclick="@(() => ChangePage(currentPage + 1))">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    private string selectedStartLocation = "Todos";
+    private string selectedDestination = "Todos";
+    private double productQuantity = 10000;
+    private List<OptimizedTrip> schedule;
+
+    private int currentPage = 1;
+    private int pageSize = 20;
+    private int totalPages => (int)Math.Ceiling((double)schedule.Count / pageSize);
+    private List<OptimizedTrip> paginatedSchedule => schedule.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+    private List<string> allClients = new List<string>
+    {
+        "La Paz", "Oruro", "Chaco", "Itau", "Viru Viru", "J.Wisterman"
+    };
+
+    private void CalculateSchedule()
+    {
+        schedule = Optimizer.GetOptimizedSchedule(
+            selectedStartLocation,
+            selectedDestination,
+            productQuantity);
+        currentPage = 1;
+    }
+
+    private void ChangePage(int pageNumber)
+    {
+        if (pageNumber >= 1 && pageNumber <= totalPages)
+        {
+            currentPage = pageNumber;
+        }
+    }
+}
