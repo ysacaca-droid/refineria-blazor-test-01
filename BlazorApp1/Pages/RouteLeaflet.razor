@@ -1,0 +1,78 @@
+﻿@page "/leaflet"
+
+
+@inject IJSRuntime JS
+
+<h3>Mapa de rutas en Bolivia (Leaflet)</h3>
+
+<div class="toolbar">
+    <label><input type="checkbox" @bind="trenesOn" /> Trenes</label>
+    @* <label><input type="checkbox" @bind="ductosOn" @onchange="ToggleDuctos" /> Ductos</label>
+    <label><input type="checkbox" @bind="fluvialOn" @onchange="ToggleFluvial" /> Fluvial</label> *@
+</div>
+
+<div id="map" style="height:70vh; border:1px solid #ccc;"></div>
+
+@code {
+    private string mapId = "bolivia";
+    private bool trenesOn = true, ductosOn = true, fluvialOn = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("boLeaflet.init", "map", mapId, new
+            {
+                center = new { lat = -16.2902, lng = -63.5887 }, // Centro de Bolivia
+                zoom = 6
+            });
+
+            await CargarCapasDemo();
+        }
+    }
+
+    private async Task CargarCapasDemo()
+    {
+        // Ejemplo: trenes (rojo)
+        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
+            new object[]
+            {
+                new { lat = -17.5, lng = -63.1 },
+                new { lat = -18.3, lng = -64.5 },
+                new { lat = -19.0, lng = -65.9 }
+            },
+            "red", "trenes");
+
+        // Ductos (naranja)
+        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
+            new object[]
+            {
+                new { lat = -16.8, lng = -62.5 },
+                new { lat = -17.9, lng = -61.3 },
+                new { lat = -18.7, lng = -60.2 }
+            },
+            "orange", "ductos");
+
+        // Fluvial (azul)
+        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
+            new object[]
+            {
+                new { lat = -15.3, lng = -62.0 },
+                new { lat = -16.2, lng = -61.0 },
+                new { lat = -17.0, lng = -60.5 }
+            },
+            "blue", "fluvial");
+
+        // Ajustamos el zoom al conjunto de trenes
+        await JS.InvokeVoidAsync("boLeaflet.fitToLayer", mapId, "trenes");
+    }
+
+    private async Task ToggleTrenes(ChangeEventArgs _) =>
+        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "trenes", trenesOn);
+
+    private async Task ToggleDuctos(ChangeEventArgs _) =>
+        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "ductos", ductosOn);
+
+    private async Task ToggleFluvial(ChangeEventArgs _) =>
+        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "fluvial", fluvialOn);
+}

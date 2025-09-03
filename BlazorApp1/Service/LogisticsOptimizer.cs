@@ -72,6 +72,9 @@ namespace BlazorApp1.Service
             if (productQuantityM3 <= 0) return schedule;
 
             // 1. Unir rutas y vehículos, calcular el costo unitario (Costo por m³) y ordenar por el más barato
+
+            var asdahsjkdh = (from route in allRoutes from vehicle in allVehicles select new { Route = route, Vehicle = vehicle});
+
             var allPossibleOptions = (from route in allRoutes
                                       from vehicle in allVehicles
                                       where (startRefineryName == "Todos" || route.StartLocation.Equals(startRefineryName, StringComparison.OrdinalIgnoreCase)) &&
