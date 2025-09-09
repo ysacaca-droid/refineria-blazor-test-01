@@ -1,0 +1,96 @@
+﻿@page "/formularioSolicitud"
+
+<h3>Solicitud de Formulario</h3>
+
+<div class="card p-4 shadow-sm">
+    <h2 class="text-center mb-4">Solicitud de Postulacion Para el Transporte de Gasolina</h2>
+    @* <h4 class="text-center text-muted mb-4">Gasolinera XYZ</h4> *@
+
+    <form action="#" method="POST">
+
+        <div class="form-section">
+            <h5 class="mb-3">1. Datos de la Empresa</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="apellidos" class="form-label">Direccion</label>
+                    <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                </div>
+                @* <div class="col-md-6">
+                    <label for="fechaNacimiento" class="form-label">Cantidad de Sisternas</label>
+                    <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
+                </div> *@
+                <div class="col-md-6">
+                    <label for="apellidos" class="form-label">Cantidad de Sisternas</label>
+                    <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="(ej. 55-1234-5678)" required>
+                </div>
+                <div class="col-12">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+            </div>
+        </div>
+
+     @*    <div class="form-section">
+            <h5 class="mb-3">2. Experiencia Laboral</h5>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="puestoAnterior" class="form-label">Puesto anterior</label>
+                    <input type="text" class="form-control" id="puestoAnterior" name="puestoAnterior" placeholder="Ej. Despachador, Cajero, etc.">
+                </div>
+                <div class="col-12">
+                    <label for="empresaAnterior" class="form-label">Nombre de la empresa anterior</label>
+                    <input type="text" class="form-control" id="empresaAnterior" name="empresaAnterior">
+                </div>
+                <div class="col-12">
+                    <label for="descripcionFunciones" class="form-label">Descripción de funciones</label>
+                    <textarea class="form-control" id="descripcionFunciones" name="descripcionFunciones" rows="3" placeholder="Describe brevemente tus responsabilidades..."></textarea>
+                </div>
+            </div>
+        </div> *@
+
+        <div class="form-section" style="margin-top: 10px;">
+            <h5 class="mb-3">2. Disponibilidad</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="turnoPreferido" class="form-label">Turno Preferido</label>
+                    <select id="turnoPreferido" name="turnoPreferido" class="form-select">
+                        <option selected>Selecciona una opción</option>
+                        <option value="matutino">Matutino</option>
+                        <option value="vespertino">Vespertino</option>
+                        <option value="nocturno">Nocturno</option>
+                        <option value="indistinto">Indistinto</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="inicioDisponibilidad" class="form-label">Disponibilidad de inicio</label>
+                    <input type="date" class="form-control" id="inicioDisponibilidad" name="inicioDisponibilidad" required>
+                </div>
+                @* <div class="col-12 mt-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="manejo" name="manejo" value="si">
+                        <label class="form-check-label" for="manejo">
+                            ¿Sabes manejar automóvil?
+                        </label>
+                    </div>
+                </div> *@
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Enviar Solicitud</button>
+        </div>
+
+    </form>
+</div>
+
+@code {
+
+}
