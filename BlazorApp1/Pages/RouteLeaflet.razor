@@ -1,78 +1,424 @@
 ﻿@page "/leaflet"
+@using models
 
 
-@inject IJSRuntime JS
+@inject IJSRuntime JSRuntime
 
-<h3>Mapa de rutas en Bolivia (Leaflet)</h3>
+<style>
+    .table-custom {
+        /* background-color: #f8f9fa; /* Fondo suave */
 
-<div class="toolbar">
-    <label><input type="checkbox" @bind="trenesOn" /> Trenes</label>
-    @* <label><input type="checkbox" @bind="ductosOn" @onchange="ToggleDuctos" /> Ductos</label>
-    <label><input type="checkbox" @bind="fluvialOn" @onchange="ToggleFluvial" /> Fluvial</label> *@
+
+        background-color: #1b6ec2; /* Fondo suave */
+        border: 1px solid #dee2e6; /* Borde suave */
+    }
+
+        .table-custom thead {
+            background-color: #1b6ec2; /* Color de fondo para el encabezado */
+            color: white; /* Texto blanco para el encabezado */
+        }
+
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #e9ecef; /* Fila impar con fondo gris claro */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Fila par con fondo blanco */
+        }
+
+    .btn-custom {
+        background-color: #007bff; /* Color de fondo azul */
+        color: white; /* Texto blanco */
+        padding: 10px 20px; /* Relleno del botón */
+        border: none;
+        border-radius: 5px; /* Bordes redondeados */
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+        .btn-custom:hover {
+            background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+        }
+</style>
+
+<div id="map-container" style="height: 600px; position: relative;">
 </div>
 
-<div id="map" style="height:70vh; border:1px solid #ccc;"></div>
+<div id="modal-punto-a" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width: 500px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-a" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Refinería Guillermo Elder Bell</h4>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Gasolina</td>
+                    <td>8000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Diesel</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Kerosene</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Solventes</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary mt-3">Postularse</button>
+    </div>
+</div>
+
+<div id="modal-punto-b" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width: 500px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-b" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Refinería Gualberto Villarroel</h4>
+        @* <h4>Gestion de Ventas</h4> *@
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Gasolina</td>
+                    <td>5000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Diesel</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Kerosene</td>
+                    <td>1000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+                <tr>
+                    <td>Solventes</td>
+                    <td>7000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Botón Postularse -->
+        <button class="btn btn-primary mt-3">Postularse</button>
+        @* <form>
+            <!-- Nombre -->
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Producto Disponible</label>
+                <input type="text" class="form-control" id="nombre" value="5000" placeholder="Producto">
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="Ingresa tu correo electrónico">
+            </div>
+
+            <!-- Teléfono -->
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="tel" class="form-control" id="telefono" placeholder="Ingresa tu número de teléfono">
+            </div>
+
+            <!-- Mensaje -->
+            <div class="mb-3">
+                <label for="mensaje" class="form-label">Mensaje</label>
+                <textarea class="form-control" id="mensaje" rows="4" placeholder="Escribe tu mensaje"></textarea>
+            </div>
+
+            <!-- Enviar -->
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form> *@
+    </div>
+</div>
+
+@* <div id="map-container" style="height: 600px; position: relative;">
+    <div id="info-panel" style="
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 200px;
+        background: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        z-index: 1000;">
+        <h4>Info</h4>
+        <p>Detalles de la ruta seleccionada</p>
+    </div>
+
+    <div id="map-buttons" style="
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;">
+        <button onclick="showRoute(1)">Ruta 1</button>
+        <button onclick="showRoute(2)">Ruta 2</button>
+        <button onclick="showRoute(3)">Ruta 3</button>
+        <button onclick="showRoute(4)">Ruta 4</button>
+    </div>
+</div>
+
+<div id="modal-container" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width: 500px; border-radius: 8px;">
+        <span class="close-btn" style="color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Detalles del Punto</h2>
+        <form id="marker-form">
+            <div class="mb-4">
+                <label for="punto-nombre" class="block text-sm font-medium text-gray-700">Nombre del Punto</label>
+                <input type="text" id="punto-nombre" name="punto-nombre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div class="mb-4">
+                <label for="punto-descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea id="punto-descripcion" name="punto-descripcion" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="punto-coordenadas" class="block text-sm font-medium text-gray-700">Coordenadas</label>
+                <input type="text" id="punto-coordenadas" name="punto-coordenadas" disabled class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100">
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div> *@
 
 @code {
-    private string mapId = "bolivia";
-    private bool trenesOn = true, ductosOn = true, fluvialOn = true;
+    // [Parameter]
+    private List<MapperRouteData> allRoutes;
+
+    protected override void OnInitialized()
+    {
+        allRoutes = new List<MapperRouteData>
+        {
+            // Ejemplo 1: Ruta de Cochabamba a La Paz (ROJO)
+            new MapperRouteData
+            {
+                Id = 1,
+                Name = "Cochabamba a La Paz",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.38, -66.15},
+                    new double[] {-17.31, -66.25},
+                    new double[] {-17.20, -66.30},
+                    new double[] {-17.05, -66.50},
+                    new double[] {-16.85, -66.80},
+                    new double[] {-16.65, -67.20},
+                    new double[] {-16.55, -67.80},
+                    new double[] {-16.50, -68.16}
+                },
+                Color = "red",
+                LineThickness = 5
+            },
+
+            new MapperRouteData
+            {
+                Id = 2,
+                Name = "Santa Cruz a Cochabamba",
+                Description = "Ruta de transporte para diésel.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.78, -63.18},
+                    new double[] {-17.60, -63.70},
+                    new double[] {-17.50, -64.20},
+                    new double[] {-17.38, -66.15}
+                },
+                Color = "red",
+                LineThickness = 4
+            },
+
+            // Ejemplo 3: Ruta de La Paz a Oruro (AZUL)
+            new MapperRouteData
+            {
+                Id = 3,
+                Name = "La Paz a Oruro",
+                Description = "Ruta de transporte para queroseno.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-16.50, -68.16},
+                    new double[] {-17.00, -67.50},
+                    new double[] {-17.96, -67.11}
+                },
+                Color = "blue",
+                LineThickness = 6
+            },
+
+            // Ejemplo 4: Ruta de Santa Cruz a Tarija (VERDE)
+            new MapperRouteData
+            {
+                Id = 4,
+                Name = "Santa Cruz a Tarija",
+                Description = "Ruta de transporte para gasolina de aviación.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.78, -63.18},
+                    new double[] {-18.50, -63.80},
+                    new double[] {-19.50, -64.50},
+                    new double[] {-20.50, -64.80},
+                    new double[] {-21.53, -64.73}
+                },
+                Color = "green",
+                LineThickness = 5
+            },
+
+            // Ejemplo 5: Ruta de Sucre a Potosí (AMARILLO)
+            new MapperRouteData
+            {
+                Id = 5,
+                Name = "Sucre a Potosí",
+                Description = "Ruta de transporte para solventes.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-19.03, -65.26},
+                    new double[] {-19.20, -65.50},
+                    new double[] {-19.58, -65.75}
+                },
+                Color = "yellow",
+                LineThickness = 3
+            }
+        };
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("boLeaflet.init", "map", mapId, new
-            {
-                center = new { lat = -16.2902, lng = -63.5887 }, // Centro de Bolivia
-                zoom = 6
-            });
-
-            await CargarCapasDemo();
+            // await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.0, -64.5, 1);
+            // await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.866367, -63.1885656, 1);
+            await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.500703, -63.1764865, 7);
         }
+
+        await JSRuntime.InvokeVoidAsync("clearLayers");
+        List<DrawPoint> puntos = new List<DrawPoint>(){
+            new DrawPoint { Name= "Santa Cruz", Latitude = -17.78, Longitude= -63.18, Type= "customIcon", Image = "/image/refineria-01.png", ModalId= "modal-punto-a" },
+            new DrawPoint { Name= "Cochabamba", Latitude = -17.38, Longitude= -66.15, Type= "customIcon", Image = "/image/refineria-01.png", ModalId= "modal-punto-b" },
+            // { name: "Potosí", lat: -19.58, lng: -65.75, tipo: "customIcon" },
+            // { name: "La Paz", lat: -16.50, lng: -68.16, tipo: "divIcon" },
+            // { name: "Santa Cruz", lat: -17.78, lng: -63.18, tipo: "fontAwesome" }
+        };
+
+        await JSRuntime.InvokeVoidAsync("drawAllMarkersInput", puntos);
+
+
+        // // Limpiar capas existentes
+        // await JSRuntime.InvokeVoidAsync("clearLayers");
+
+        // // Dibujar todas las rutas y marcadores
+        // if (allRoutes != null && allRoutes.Any())
+        // {
+        //     foreach (var route in allRoutes)
+        //     {
+        //         // Dibujar la polilínea de la ruta
+        //         await JSRuntime.InvokeVoidAsync("drawRoute", route.Routes, route.Color, route.LineThickness, true);
+
+        //         // Agregar los marcadores de origen y destino
+        //         if (route.Routes.Any())
+        //         {
+        //             // Marcador de origen
+        //             await JSRuntime.InvokeVoidAsync("drawMarker", route.Routes.First()[0], route.Routes.First()[1], $"<b>Origen:</b> {route.Name}", "/image/ducteo-01.png");
+        //             // Marcador de destino
+        //             await JSRuntime.InvokeVoidAsync("drawMarker", route.Routes.Last()[0], route.Routes.Last()[1], $"<b>Destino:</b> {route.Name}", "/image/gasolina-04.png");
+
+        //             await JSRuntime.InvokeVoidAsync("animateCar", route.Routes, "/image/cart.png");
+        //         }
+        //     }
+        // }
     }
 
-    private async Task CargarCapasDemo()
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Inicializar el mapa al renderizar el componente por primera vez
+    //         await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.0, -64.5, 6);
+    //     }
+
+    //     // Limpiar capas existentes
+    //     await JSRuntime.InvokeVoidAsync("clearLayers");
+
+    //     // Dibujar las rutas y marcadores
+    //     if (allRoutes != null && allRoutes.Any())
+    //     {
+    //         foreach (var route in allRoutes)
+    //         {
+    //             // Dibujar la polilínea de la ruta
+    //             await JSRuntime.InvokeVoidAsync("drawRoute", route, "red", 5);
+
+    //             // Agregar el marcador de inicio y fin para cada ruta
+    //             if (route.Any())
+    //             {
+    //                 // Marcador de origen
+    //                 await JSRuntime.InvokeVoidAsync("drawMarker", route.First()[0], route.First()[1], "Origen");
+    //                 // Marcador de destino
+    //                 await JSRuntime.InvokeVoidAsync("drawMarker", route.Last()[0], route.Last()[1], "Destino");
+    //             }
+    //         }
+    //     }
+    // }
+
+    public async ValueTask DisposeAsync()
     {
-        // Ejemplo: trenes (rojo)
-        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
-            new object[]
-            {
-                new { lat = -17.5, lng = -63.1 },
-                new { lat = -18.3, lng = -64.5 },
-                new { lat = -19.0, lng = -65.9 }
-            },
-            "red", "trenes");
-
-        // Ductos (naranja)
-        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
-            new object[]
-            {
-                new { lat = -16.8, lng = -62.5 },
-                new { lat = -17.9, lng = -61.3 },
-                new { lat = -18.7, lng = -60.2 }
-            },
-            "orange", "ductos");
-
-        // Fluvial (azul)
-        await JS.InvokeVoidAsync("boLeaflet.addPolyline", mapId,
-            new object[]
-            {
-                new { lat = -15.3, lng = -62.0 },
-                new { lat = -16.2, lng = -61.0 },
-                new { lat = -17.0, lng = -60.5 }
-            },
-            "blue", "fluvial");
-
-        // Ajustamos el zoom al conjunto de trenes
-        await JS.InvokeVoidAsync("boLeaflet.fitToLayer", mapId, "trenes");
+        // Código para limpiar recursos si es necesario
     }
+    // public List<List<double[]>> RouteData { get; set; }
 
-    private async Task ToggleTrenes(ChangeEventArgs _) =>
-        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "trenes", trenesOn);
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Inicializar el mapa al renderizar el componente por primera vez
+    //         // Coordenadas del centro de Bolivia
+    //         await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.0, -64.5, 6);
+    //     }
 
-    private async Task ToggleDuctos(ChangeEventArgs _) =>
-        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "ductos", ductosOn);
+    //     // Limpiar rutas existentes antes de dibujar las nuevas
+    //     await JSRuntime.InvokeVoidAsync("clearRoutes");
 
-    private async Task ToggleFluvial(ChangeEventArgs _) =>
-        await JS.InvokeVoidAsync("boLeaflet.setLayerVisible", mapId, "fluvial", fluvialOn);
+    //     // Dibujar las rutas pasadas como parámetro
+    //     if (RouteData != null)
+    //     {
+    //         foreach (var route in RouteData)
+    //         {
+    //             await JSRuntime.InvokeVoidAsync("drawRoute", route, "red", 5);
+    //         }
+    //     }
+    // }
+
+    // public async ValueTask DisposeAsync()
+    // {
+    //     // Puedes agregar código para limpiar el mapa si es necesario,
+    //     // aunque la función `initMap` ya se encarga de esto.
+    // }
 }

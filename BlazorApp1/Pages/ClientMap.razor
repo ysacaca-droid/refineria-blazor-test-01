@@ -1,0 +1,392 @@
+﻿@page "/clientMap"
+@using models
+
+@inject IJSRuntime JSRuntime
+
+<style>
+    .table-custom {
+        /* background-color: #f8f9fa; /* Fondo suave */
+
+
+        background-color: #1b6ec2; /* Fondo suave */
+        border: 1px solid #dee2e6; /* Borde suave */
+    }
+
+        .table-custom thead {
+            background-color: #1b6ec2; /* Color de fondo para el encabezado */
+            color: white; /* Texto blanco para el encabezado */
+        }
+
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #e9ecef; /* Fila impar con fondo gris claro */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Fila par con fondo blanco */
+        }
+
+    .btn-custom {
+        background-color: #007bff; /* Color de fondo azul */
+        color: white; /* Texto blanco */
+        padding: 10px 20px; /* Relleno del botón */
+        border: none;
+        border-radius: 5px; /* Bordes redondeados */
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+        .btn-custom:hover {
+            background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+        }
+</style>
+
+<div id="map-container" style="height: 600px; position: relative;">
+</div>
+
+<div id="modal-punto-a" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:100%; max-width: 700px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-a" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Cliente Base Oruro</h4>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Refineria</th>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Gasolina</td>
+                    <td>8000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Diesel</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Kerosene</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Solventes</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+            </tbody>
+        </table>
+        @* <button class="btn btn-primary mt-3">Postularse</button> *@
+    </div>
+</div>
+
+<div id="modal-punto-b" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:100%; max-width: 700px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-b" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Cliente Base Guayaramerin</h4>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Refineria</th>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Gasolina</td>
+                    <td>8000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Diesel</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Kerosene</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Cochabamba</td>
+                    <td>Solventes</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        @* <button class="btn btn-primary mt-3">Postularse</button> *@
+    </div>
+</div>
+
+<div id="modal-punto-c" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:100%; max-width: 700px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-c" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Cliente Base Puerto Suarez</h4>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Refineria</th>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Gasolina</td>
+                    <td>8000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Diesel</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Kerosene</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Solventes</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modal-punto-d" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:100%; max-width: 700px; border-radius: 8px;">
+        <span class="close-btn" data-modal-id="modal-punto-d" style="color:#aaa; text-align:end; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        <h4 style="color: #3c3c3c; text-align: center;">Cliente Base San Jose</h4>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Refineria</th>
+                    <th>Nombre</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Gasolina</td>
+                    <td>8000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Diesel</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Kerosene</td>
+                    <td>2000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+                <tr>
+                    <td>Santa Cruz</td>
+                    <td>Solventes</td>
+                    <td>4000</td>
+                    <td>Metros cúbicos</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary mt-3">Postularse</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@code {
+    // [Parameter]
+    private List<MapperRouteData> allRoutes;
+
+    protected override void OnInitialized()
+    {
+        allRoutes = new List<MapperRouteData>
+        {
+            // Ejemplo 1: Ruta de Cochabamba a La Paz (ROJO)
+            new MapperRouteData
+            {
+                Id = 1,
+                Name = "Cochabamba a La Paz",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.38, -66.15},
+                    new double[] {-17.31, -66.25},
+                    new double[] {-17.20, -66.30},
+                    new double[] {-17.05, -66.50},
+                    new double[] {-16.85, -66.80},
+                    new double[] {-16.65, -67.20},
+                    new double[] {-16.55, -67.80},
+                    new double[] {-16.50, -68.16}
+                },
+                Color = "red",
+                LineThickness = 5
+            },
+
+            new MapperRouteData
+            {
+                Id = 2,
+                Name = "Santa Cruz a Cochabamba",
+                Description = "Ruta de transporte para diésel.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.78, -63.18},
+                    new double[] {-17.60, -63.70},
+                    new double[] {-17.50, -64.20},
+                    new double[] {-17.38, -66.15}
+                },
+                Color = "red",
+                LineThickness = 4
+            },
+
+            // Ejemplo 3: Ruta de La Paz a Oruro (AZUL)
+            new MapperRouteData
+            {
+                Id = 3,
+                Name = "La Paz a Oruro",
+                Description = "Ruta de transporte para queroseno.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-16.50, -68.16},
+                    new double[] {-17.00, -67.50},
+                    new double[] {-17.96, -67.11}
+                },
+                Color = "blue",
+                LineThickness = 6
+            },
+
+            // Ejemplo 4: Ruta de Santa Cruz a Tarija (VERDE)
+            new MapperRouteData
+            {
+                Id = 4,
+                Name = "Santa Cruz a Tarija",
+                Description = "Ruta de transporte para gasolina de aviación.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.78, -63.18},
+                    new double[] {-18.50, -63.80},
+                    new double[] {-19.50, -64.50},
+                    new double[] {-20.50, -64.80},
+                    new double[] {-21.53, -64.73}
+                },
+                Color = "green",
+                LineThickness = 5
+            },
+
+            // Ejemplo 5: Ruta de Sucre a Potosí (AMARILLO)
+            new MapperRouteData
+            {
+                Id = 5,
+                Name = "Sucre a Potosí",
+                Description = "Ruta de transporte para solventes.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-19.03, -65.26},
+                    new double[] {-19.20, -65.50},
+                    new double[] {-19.58, -65.75}
+                },
+                Color = "yellow",
+                LineThickness = 3
+            }
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.0, -64.5, 1);
+            // await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.866367, -63.1885656, 1);
+            await JSRuntime.InvokeVoidAsync("initMap", "map-container", -17.500703, -63.1764865, 6);
+        }
+
+        await JSRuntime.InvokeVoidAsync("clearLayers");
+        List<DrawPoint> puntos = new List<DrawPoint>(){
+            new DrawPoint { Name= "Santa Cruz", Latitude = -17.78, Longitude= -63.18, Type= "customIcon", Image = "/image/refineria-01.png", ModalId= "" },
+            new DrawPoint { Name= "Cochabamba", Latitude = -17.38, Longitude= -66.15, Type= "customIcon", Image = "/image/refineria-01.png", ModalId= "" },
+
+            new DrawPoint { Name= "Oruro", Latitude = -17.9514032, Longitude= -67.1355149, Type= "customIcon", Image = "/image/ducteo-01.png", ModalId= "modal-punto-a" },
+            new DrawPoint { Name= "Guayaramerin", Latitude = -10.83, Longitude= -65.37, Type= "customIcon", Image = "/image/fluvial-01.png", ModalId= "modal-punto-b" },
+            new DrawPoint { Name= "Puerto Suarez", Latitude = -18.9440734, Longitude= -57.8508274, Type= "customIcon", Image = "/image/estacion-02.png", ModalId= "modal-punto-c" },
+            new DrawPoint { Name= "San Jose", Latitude = -17.85, Longitude= -60.75, Type= "customIcon", Image = "/image/gasolina-04.png", ModalId= "modal-punto-d" },
+            new DrawPoint { Name= "Potosi", Latitude = -19.57, Longitude= -65.75, Type= "customIcon", Image = "/image/gasolina-04.png", ModalId= "modal-punto-d" },
+            // { name: "Potosí", lat: -19.58, lng: -65.75, tipo: "customIcon" },
+            // { name: "La Paz", lat: -16.50, lng: -68.16, tipo: "divIcon" },
+            // { name: "Santa Cruz", lat: -17.78, lng: -63.18, tipo: "fontAwesome" }
+        };
+
+        await JSRuntime.InvokeVoidAsync("drawAllMarkersInput", puntos);
+
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Código para limpiar recursos si es necesario
+    }
+    
+}

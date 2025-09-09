@@ -2,30 +2,32 @@
 @inject LogisticsOptimizer Optimizer
 @using BlazorApp1.Service
 @using Microsoft.AspNetCore.Components.Web
+@using models
 
 <h3>Optimizador de Rutas Logísticas</h3>
 
 <div class="container">
     <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="startLocation">Origen (Refinería)</label>
-            <select class="form-select" @bind="selectedStartLocation">
-                <option value="Todos">Todos</option>
-                <option value="Cochabamba">Cochabamba</option>
-                <option value="Santa Cruz">Santa Cruz</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label for="endLocation">Destino (Cliente)</label>
-            <select class="form-select" @bind="selectedDestination">
-                <option value="Todos">Todos</option>
-                @foreach (var client in allClients)
-                {
-                    <option value="@client">@client</option>
-                }
-            </select>
-        </div>
+    <div class="col-md-6">
+        <label for="startLocation">Origen (Refinería)</label>
+            <select class="form-select" @onchange="OnStartLocationChanged">
+                @* @onclick="@(() => ChangePage(pageNumber))" *@
+            <option value="Todos">Todos</option>
+            <option value="Cochabamba">Cochabamba</option>
+            <option value="Santa Cruz">Santa Cruz</option>
+        </select>
     </div>
+    <div class="col-md-6">
+        <label for="endLocation">Destino (Cliente)</label>
+        <select class="form-select" @bind="selectedDestination">
+            <option value="Todos">Todos</option>
+            @foreach (var client in filteredClients)
+            {
+                <option value="@client">@client</option>
+            }
+        </select>
+    </div>
+</div>
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="quantity">Cantidad Total (m³)</label>
@@ -107,6 +109,36 @@
     {
         "La Paz", "Oruro", "Chaco", "Itau", "Viru Viru", "J.Wisterman"
     };
+
+    private List<string> filteredClients = new List<string>();
+
+    private void OnStartLocationChanged(ChangeEventArgs e)
+    {
+        selectedStartLocation = e.Value.ToString();
+        FilterDestinations();
+    }
+
+    private void FilterDestinations()
+    {
+        // Filtrar los destinos según el origen seleccionado
+        if (selectedStartLocation == "Cochabamba")
+        {
+            filteredClients = new List<string> { "La Paz", "Oruro", "Chaco" };
+        }
+        else if (selectedStartLocation == "Santa Cruz")
+        {
+            filteredClients = new List<string> { "La Paz", "Itau", "Viru Viru" };
+        }
+        else if (selectedStartLocation == "La Paz")
+        {
+            filteredClients = new List<string> { "Oruro", "Chaco", "Itau" };
+        }
+        else
+        {
+            // Si es "Todos", mostrar todos los destinos disponibles
+            filteredClients = new List<string> { "La Paz", "Oruro", "Chaco", "Itau", "Viru Viru", "J.Wisterman" };
+        }
+    }
 
     private void CalculateSchedule()
     {

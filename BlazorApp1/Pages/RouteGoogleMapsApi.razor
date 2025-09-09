@@ -1,0 +1,908 @@
+﻿@page "/googleApi"
+
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<h1>Rutas a nivel Nacional</h1>
+
+@* <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 600px;">
+    <div id="map-container-1" class="map-container"></div>
+
+    <div id="map-container-2" class="map-container"></div>
+
+    <div id="map-container-3" class="map-container"></div>
+
+    <div id="map-container-4" class="map-container"></div>
+</div> *@
+
+<style>
+    /* Estilos para los contenedores de mapa individuales */
+    .map-wrapper {
+        flex: 1; /* Para que ocupen el espacio disponible */
+        height: 100%; /* Ocupar la altura completa del contenedor padre */
+        border-radius: 15px; /* Bordes redondeados */
+        overflow: hidden; /* Asegura que el contenido (el mapa) no sobresalga del borde redondeado */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra sutil para darle profundidad */
+        display: flex; /* Usar flexbox para centrar el título y el mapa */
+        flex-direction: column; /* Apilar elementos verticalmente */
+    }
+
+    .map-title {
+        text-align: center;
+        padding: 10px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: white;
+        background-color: #333; /* Un fondo ligero para el título */
+        border-bottom: 1px solid #eee; /* Separador sutil */
+    }
+
+    .google-map-embed {
+        flex-grow: 1; /* Hace que el mapa ocupe todo el espacio restante */
+        width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    }
+</style>
+
+<button @onclick="StartAnimation" class="btn btn-primary mt-3">
+    Iniciar Animación de Ruta
+</button>
+<div style="display: flex; gap: 20px; height: 600px;">
+    <div class="map-wrapper">
+        <div class="map-title">Rutas Ducteas</div>
+        <div id="map-ducteos-container" class="google-map-embed"></div>
+    </div>
+    <div class="map-wrapper">
+        <div class="map-title">Rutas Fluviales</div>
+        <div id="map-fluviales-container" class="google-map-embed"></div>
+    </div>
+</div>
+<br />
+<div style="display: flex; gap: 20px; height: 600px;">
+    <div class="map-wrapper">
+        <div class="map-title">Rutas Ferroviaria</div>
+        <div id="map-ferroviaria-container" class="google-map-embed"></div>
+    </div>
+    <div class="map-wrapper">
+        <div class="map-title">Rutas Carretera</div>
+        <div id="map-carretera-container" class="google-map-embed"></div>
+    </div>
+</div>
+
+@* <div style="display: flex; height: 600px;">
+
+    <div id="google-map-container" style="flex: 1; height: 100%; border-radius: 15px; overflow: hidden;"></div>
+
+    <div style="flex: 1; padding: 20px; background-color: #f4f4f4;">
+        <h3>Información adicional</h3>
+        <p>Aquí puedes agregar cualquier otro contenido que necesites mostrar en la mitad derecha del mapa.</p>
+
+        <button @onclick="StartAnimation" class="btn btn-primary mt-3">
+            Iniciar Animación de Ruta
+        </button>
+    </div>
+</div> *@
+
+@* <div id="google-map-container" style="height: 600px;"></div> *@
+
+@code {
+    private List<models.MapperRouteData> routesDucteos;
+    private List<models.MapperRouteData> routesFluvials;
+    private List<models.MapperRouteData> routesFerroviarias;
+    private List<models.MapperRouteData> routesCarretera;
+
+    protected override void OnInitialized()
+    {
+        routesFluvials = new List<models.MapperRouteData>
+        {
+            new models.MapperRouteData
+                        {
+                            Id = 8, // Asegúrate de que este ID sea único
+                            Name = "Ruta de Ejemplo Segmentada",
+                            Description = "Esta es una ruta con una línea de puntos.",
+                            Routes = new List<double[]>
+                            {
+                                new double[] {-10.82, -65.37}, // Guayaramerín
+            new double[] {-14.83, -64.90}
+                            },
+                            Color = "#00008B", // Puedes usar un color diferente si lo deseas
+                            LineThickness = 5, // Ajusta el grosor del punto
+                            IsDotted = false // <-- ¡Aquí está la clave!
+                        },
+
+                        new models.MapperRouteData
+                        {
+                            Id = 8, // Asegúrate de que este ID sea único
+                            Name = "Ruta de Ejemplo Segmentada",
+                            Description = "Esta es una ruta con una línea de puntos.",
+                            Routes = new List<double[]>
+                            {
+                                new double[] {-10.82, -65.37}, // Guayaramerín
+            new double[] {-16.89, -64.75} // Puerto Villarroel
+                            },
+                            Color = "#00008B", // Puedes usar un color diferente si lo deseas
+                            LineThickness = 5, // Ajusta el grosor del punto
+                            IsDotted = false // <-- ¡Aquí está la clave!
+                        },
+        };
+
+        routesFerroviarias = new List<models.MapperRouteData>
+        {
+            new models.MapperRouteData
+            {
+                Id = 8, // Asegúrate de que este ID sea único
+                Name = "Ruta de Ejemplo Segmentada",
+                Description = "Esta es una ruta con una línea de puntos.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.78, -63.18}, // Santa Cruz
+                    new double[] {-17.85, -60.75}
+                },
+                Color = "#8B4513", // Puedes usar un color diferente si lo deseas
+                LineThickness = 5, // Ajusta el grosor del punto
+                IsDotted = true // <-- ¡Aquí está la clave!
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 8, // Asegúrate de que este ID sea único
+                Name = "Ruta de Ejemplo Segmentada",
+                Description = "Esta es una ruta con una línea de puntos.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.85, -60.75},
+                    new double[] {-18.96, -57.80}
+                },
+                Color = "#8B4513", // Puedes usar un color diferente si lo deseas
+                LineThickness = 5, // Ajusta el grosor del punto
+                IsDotted = true // <-- ¡Aquí está la clave!
+            },
+        };
+
+        routesCarretera = new List<models.MapperRouteData>
+        {
+            new models.MapperRouteData
+{
+    Id = 10,
+    Name = "Santa Cruz a San José",
+    Description = "Ruta hacia el este.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.78, -63.18},
+        new double[] {-17.85, -60.75}
+    },
+    Color = "#FF4500",
+    LineThickness = 5,
+    IsDotted = false
+},
+
+new models.MapperRouteData
+{
+    Id = 11,
+    Name = "Santa Cruz a Villamontes",
+    Description = "Ruta hacia el sur.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.78, -63.18}, // Santa Cruz
+        new double[] {-21.26, -63.46} // Villamontes
+    },
+    Color = "#FF4500", // Azul violeta
+    LineThickness = 5,
+    IsDotted = false
+},
+
+new models.MapperRouteData
+{
+    Id = 12,
+    Name = "Santa Cruz a Monteagudo",
+    Description = "Ruta hacia el sureste.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.78, -63.18}, // Santa Cruz
+        new double[] {-19.79, -63.99} // Monteagudo
+    },
+    Color = "#FF4500", // Vara de oro
+    LineThickness = 5,
+    IsDotted = false // Línea segmentada
+},
+
+new models.MapperRouteData
+{
+    Id = 13,
+    Name = "Santa Cruz a Cochabamba",
+    Description = "Ruta hacia el oeste.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.78, -63.18}, // Santa Cruz
+        new double[] {-17.38, -66.15} // Cochabamba
+    },
+    Color = "#FF4500", // Tomate
+    LineThickness = 5,
+    IsDotted = false
+},
+
+new models.MapperRouteData
+{
+    Id = 14,
+    Name = "Santa Cruz a Trinidad",
+    Description = "Ruta hacia el norte.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.78, -63.18}, // Santa Cruz
+        new double[] {-14.83, -64.90} // Trinidad
+    },
+    Color = "#FF4500", // Verde medio marino
+    LineThickness = 5,
+    IsDotted = false // Línea segmentada
+},
+
+// OTRA SECCION
+new models.MapperRouteData
+    {
+        Id = 15,
+        Name = "Potosí a Sucre",
+        Description = "Ruta de la ciudad de la plata a la capital constitucional.",
+        Routes = new List<double[]>
+        {
+            new double[] {-19.57, -65.75}, // Potosí
+            // new double[] {-19.53, -65.65},
+            // new double[] {-19.49, -65.56},
+            // new double[] {-19.45, -65.46},
+            // new double[] {-19.41, -65.37},
+            // new double[] {-19.37, -65.28},
+            // new double[] {-19.33, -65.18},
+            // new double[] {-19.29, -65.09},
+            // new double[] {-19.25, -65.00},
+            // new double[] {-19.21, -64.90},
+            // new double[] {-19.17, -64.81},
+            new double[] {-19.04, -65.25} // Sucre
+        },
+        Color = "#FF4500", // Azul violeta
+        LineThickness = 5,
+        IsDotted = false
+    },
+
+    // Ruta 2: Potosí a Tarija
+    new models.MapperRouteData
+    {
+        Id = 16,
+        Name = "Potosí a Tarija",
+        Description = "Ruta hacia el sur a la ciudad de las flores.",
+        Routes = new List<double[]>
+        {
+            new double[] {-19.57, -65.75}, // Potosí
+            // new double[] {-19.80, -65.59},
+            // new double[] {-20.03, -65.43},
+            // new double[] {-20.26, -65.27},
+            // new double[] {-20.49, -65.11},
+            // new double[] {-20.72, -64.95},
+            // new double[] {-20.95, -64.79},
+            // new double[] {-21.18, -64.63},
+            // new double[] {-21.41, -64.47},
+            // new double[] {-21.64, -64.31},
+            // new double[] {-21.87, -64.15},
+            new double[] {-21.53, -64.73} // Tarija
+        },
+        Color = "#FF4500", // Carmesí
+        LineThickness = 5,
+        IsDotted = false
+    },
+
+    // Ruta 3: Tarija a Bermejo
+    new models.MapperRouteData
+    {
+        Id = 17,
+        Name = "Tarija a Bermejo",
+        Description = "Ruta desde la capital chapaca hasta la frontera con Argentina.",
+        Routes = new List<double[]>
+        {
+            new double[] {-21.53, -64.73}, // Tarija
+            // new double[] {-21.60, -64.62},
+            // new double[] {-21.67, -64.51},
+            // new double[] {-21.74, -64.40},
+            // new double[] {-21.81, -64.29},
+            // new double[] {-21.88, -64.18},
+            // new double[] {-21.95, -64.07},
+            // new double[] {-22.02, -63.96},
+            // new double[] {-22.09, -63.85},
+            // new double[] {-22.16, -63.74},
+            // new double[] {-22.23, -63.63},
+            new double[] {-22.75, -64.33} // Bermejo
+        },
+        Color = "#FF4500", // Acero azulado
+        LineThickness = 5,
+        IsDotted = false
+    },
+
+    // Ruta 4: Potosí a Villazón
+    new models.MapperRouteData
+    {
+        Id = 18,
+        Name = "Potosí a Villazón",
+        Description = "Ruta hacia la frontera sur de Bolivia.",
+        Routes = new List<double[]>
+        {
+        new double[] {-19.58, -65.75},   // Potosí
+        // new double[] {-20.73, -65.65},   // Tramo intermedio
+        // new double[] {-21.46, -65.71},   // Cerca de Tupiza
+        new double[] {-22.05, -65.59}    // Villazón
+        },
+        Color = "#FF4500", // Naranja oscuro
+        LineThickness = 5,
+        IsDotted = false
+    },
+
+    // Ruta 5: Potosí a Tupiza
+    new models.MapperRouteData
+    {
+        Id = 19,
+        Name = "Potosí a Tupiza",
+        Description = "Ruta hacia el sur de Bolivia, cerca de la frontera.",
+        Routes = new List<double[]>
+        {
+            new double[] {-19.57, -65.75}, // Potosí
+            // new double[] {-20.00, -65.81},
+            // new double[] {-20.43, -65.87},
+            // new double[] {-20.86, -65.93},
+            // new double[] {-21.29, -65.99},
+            // new double[] {-21.72, -66.05},
+            // new double[] {-22.15, -66.11},
+            // new double[] {-22.58, -66.17},
+            // new double[] {-23.01, -66.23},
+            // new double[] {-23.44, -66.29},
+            // new double[] {-23.87, -66.35},
+            new double[] {-21.45, -65.71} // Tupiza
+        },
+        Color = "#FF4500", // Verde marino
+        LineThickness = 5,
+        IsDotted = false
+    },
+
+    // Ruta 6: Potosí a Uyuni
+            new models.MapperRouteData
+            {
+                Id = 20,
+                Name = "Potosí a Uyuni",
+                Description = "Ruta a través del altiplano hasta el salar.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-19.57, -65.75}, // Potosí
+                    // new double[] {-19.79, -66.00},
+                    // new double[] {-20.01, -66.25},
+                    // new double[] {-20.23, -66.50},
+                    // new double[] {-20.45, -66.75},
+                    // new double[] {-20.67, -67.00},
+                    // new double[] {-20.89, -67.25},
+                    // new double[] {-21.11, -67.50},
+                    // new double[] {-21.33, -67.75},
+                    // new double[] {-21.55, -68.00},
+                    // new double[] {-21.77, -68.25},
+                    new double[] {-20.46, -66.82} // Uyuni
+                },
+                Color = "#FF4500", // Rojo anaranjado
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            // 3RA SECCION
+            new models.MapperRouteData
+{
+    Id = 19,
+    Name = "Cochabamba a Oruro",
+    Description = "Ruta de conexión entre Cochabamba y Oruro.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.38, -66.15},   // Cochabamba
+        // new double[] {-17.65, -66.50},   // Tramo intermedio
+        // new double[] {-17.93, -66.85},   // Tramo intermedio
+        new double[] {-17.9514032, -67.1355149}    // Oruro
+    },
+    Color = "#FF4500", // Azul acero
+    LineThickness = 5,
+    IsDotted = false
+},
+new models.MapperRouteData
+{
+    Id = 20,
+    Name = "Oruro a Uyuni",
+    Description = "Ruta hacia el famoso Salar de Uyuni.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.9514032, -67.1355149},   // Oruro
+        // new double[] {-19.00, -67.50},   // Tramo intermedio
+        // new double[] {-19.50, -67.80},   // Tramo intermedio
+        new double[] {-20.45, -66.81}    // Uyuni
+    },
+    Color = "#FF4500", // Verde medio
+    LineThickness = 5,
+    IsDotted = false
+},
+new models.MapperRouteData
+{
+    Id = 21,
+    Name = "Oruro a Senkata",
+    Description = "Ruta de Oruro a Senkata, en la ciudad de El Alto.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.9514032, -67.1355149},   // Oruro
+        // new double[] {-17.50, -67.75},   // Tramo intermedio
+        new double[] {-16.57, -68.18}    // Senkata
+    },
+    Color = "#FF4500", // Naranja oscuro
+    LineThickness = 5,
+    IsDotted = false
+},
+// ROJO DRAW
+new models.MapperRouteData
+{
+    Id = 22,
+    Name = "Oruro a Potosí",
+    Description = "Ruta de conexión entre Oruro y la ciudad de Potosí.",
+    Routes = new List<double[]>
+    {
+        new double[] {-17.9514032, -67.1355149},   // Oruro
+        // new double[] {-18.80, -67.00},   // Tramo intermedio
+        new double[] {-19.58, -65.75}    // Potosí
+    },
+    Color = "#FF4500", // Azul violeta
+    LineThickness = 5,
+    IsDotted = false
+},
+
+new models.MapperRouteData
+{
+    Id = 23,
+    Name = "Senkata a Riberalta",
+    Description = "Ruta desde la ciudad de El Alto hacia el norte de Bolivia.",
+    Routes = new List<double[]>
+    {
+        new double[] {-16.57, -68.18},   // Senkata
+        // new double[] {-15.50, -67.50},   // Tramo intermedio (norte de La Paz)
+        // new double[] {-14.00, -66.00},   // Tramo intermedio (Beni)
+        new double[] {-11.00, -66.10}    // Riberalta
+    },
+    Color = "#FF4500", // Azul violeta
+    LineThickness = 5,
+    IsDotted = false
+},
+new models.MapperRouteData
+{
+    Id = 24,
+    Name = "Riberalta a Guayaramerín",
+    Description = "Ruta de conexión entre Riberalta y la ciudad de Guayaramerín.",
+    Routes = new List<double[]>
+    {
+        new double[] {-11.00, -66.10},   // Riberalta
+        new double[] {-10.83, -65.37}    // Guayaramerín
+    },
+    Color = "#FF4500", // Azul violeta
+    LineThickness = 5,
+    IsDotted = false
+},
+new models.MapperRouteData
+{
+    Id = 25,
+    Name = "Riberalta a Cobija",
+    Description = "Ruta de conexión entre Riberalta y la capital de Pando.",
+    Routes = new List<double[]>
+    {
+        new double[] {-11.00, -66.10},   // Riberalta
+        // new double[] {-11.38, -67.80},   // Tramo intermedio
+        new double[] {-11.02, -68.75}    // Cobija
+    },
+    Color = "#FF4500", // Azul violeta
+    LineThickness = 5,
+    IsDotted = false
+}
+        };
+
+        routesDucteos = new List<models.MapperRouteData>
+        {
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Cochabamba a La Paz",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                        new double[] {-17.8754256, -63.2012179},
+                        new double[] {-18.0682226, -63.2005080},
+                        new double[] {-18.2610196, -63.1997981},
+                        new double[] {-18.4538166, -63.1990882},
+                        new double[] {-18.6466136, -63.1983783},
+                        new double[] {-18.8394106, -63.1976684},
+                        new double[] {-19.0322076, -63.1969585},
+                        new double[] {-19.2250046, -63.1962486},
+                        new double[] {-19.4178016, -63.1955387},
+                        new double[] {-19.6105986, -63.1948288},
+                        new double[] {-19.8033956, -63.1941189},
+                        new double[] {-20.0774485, -63.1934804}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Cochabamba a La Paz",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-20.0774485, -63.1934804},
+                    new double[] {-19.8218433, -63.9792883}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Monteagudo a Sucre",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-19.79, -63.99},
+                    new double[] {-19.04, -65.25}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Sucre a Potosi",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-19.04, -65.25},
+                    new double[] {-19.57, -65.75}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "La Paz a Oruro",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-16.50, -68.16},
+                    new double[] {-17.97, -67.10}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Oruro a Cochabamba",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-17.97, -67.10},
+                    new double[] {-17.38, -66.15}
+                },
+                Color = "#008000",
+                LineThickness = 3,
+                IsDotted = true
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Cochabamba a Pto. Villarroel",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                        new double[] {-17.38, -66.15},
+                        // new double[] {-17.15, -65.80},
+                        // new double[] {-17.00, -65.45},
+                        // new double[] {-16.90, -65.00},
+                        // new double[] {-16.90, -64.80},
+                        new double[] {-16.89, -64.75}
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 1,
+                TransportVehicleId = 4,
+                Name = "Tarija a Villamontes",
+                Description = "Ruta de transporte para gasolina súper.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-21.53, -64.73}, // Tarija
+                    // new double[] {-21.65, -64.30},
+                    // new double[] {-21.80, -63.90},
+                    new double[] {-21.26, -63.46}  // Villamontes
+                },
+                Color = "#008000",
+                LineThickness = 5,
+                IsDotted = false
+            },
+
+            new models.MapperRouteData
+            {
+                Id = 8,
+                TransportVehicleId = 4,
+                Name = "Ruta de Ejemplo Segmentada",
+                Description = "Esta es una ruta con una línea de puntos.",
+                Routes = new List<double[]>
+                {
+                    new double[] {-21.26, -63.46}, // Santa Cruz
+                    new double[] {-20.0774485, -63.1934804} // Otro punto
+                },
+                Color = "#008000", // Puedes usar un color diferente si lo deseas
+                LineThickness = 3, // Ajusta el grosor del punto
+                IsDotted = true // <-- ¡Aquí está la clave!
+            },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        //     await CreateAndDrawMaps();
+        // }
+        if (firstRender)
+        {
+            // 1. DIBUJAR MAPA FLUVIAL
+            await JSRuntime.InvokeVoidAsync("createMap", "map-fluviales-container", -17.0, -64.5, 6);
+            await JSRuntime.InvokeVoidAsync("addRefineryMarker");
+            await JSRuntime.InvokeVoidAsync("addRefineryCochabamba");
+            await JSRuntime.InvokeVoidAsync("addFluvialGuayaramerin");
+            await JSRuntime.InvokeVoidAsync("addFluvialTrinidad");
+            await JSRuntime.InvokeVoidAsync("addFluvialVillarroel");
+
+            if (routesFluvials != null && routesFluvials.Any())
+            {
+                foreach (var route in routesFluvials)
+                {
+                    if (route.IsDotted)
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDottedLine", route.Routes, route.Color, route.LineThickness);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawPolyline", route.Routes, route.Color, route.LineThickness);
+                    }
+
+                    if (route.Routes.Any())
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.First()[0],
+                            route.Routes.First()[1],
+                            $"Origen: {route.Name}",
+                            route.Color);
+
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.Last()[0],
+                            route.Routes.Last()[1],
+                            $"Destino: {route.Name}",
+                            route.Color);
+                    }
+                }
+            }
+
+            // 2. DIBUJAR MAPA DUCTEO
+            await JSRuntime.InvokeVoidAsync("createMap", "map-ducteos-container", -17.0, -64.5, 6);
+            await JSRuntime.InvokeVoidAsync("addRefineryMarker");
+            await JSRuntime.InvokeVoidAsync("addRefineryCochabamba");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -20.0774485, -63.1934804, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -19.8218433, -63.9792883, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -19.04, -65.25, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -19.57, -65.75, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -17.97, -67.10, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -17.38, -66.15, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -16.89, -64.75, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -21.26, -63.46, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -20.0774485, -63.1934804, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -16.50, -68.16, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -21.53, -64.73, "/image/ducteo-01.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+
+            if (routesDucteos != null && routesDucteos.Any())
+            {
+                foreach (var route in routesDucteos)
+                {
+                    if (route.IsDotted)
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDottedLine", route.Routes, route.Color, route.LineThickness);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawPolyline", route.Routes, route.Color, route.LineThickness);
+                    }
+
+                    if (route.Routes.Any())
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.First()[0],
+                            route.Routes.First()[1],
+                            $"Origen: {route.Name}",
+                            route.Color);
+
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.Last()[0],
+                            route.Routes.Last()[1],
+                            $"Destino: {route.Name}",
+                            route.Color);
+                    }
+                }
+            }
+
+            // 3. DIBUJAR MAPA FERROVIARIA
+            await JSRuntime.InvokeVoidAsync("createMap", "map-ferroviaria-container", -17.0, -64.5, 6);
+            await JSRuntime.InvokeVoidAsync("addRefineryMarker");
+            await JSRuntime.InvokeVoidAsync("addRefineryCochabamba");
+
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -17.85, -60.75, "/image/estacion-02.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            await JSRuntime.InvokeVoidAsync("drawIconoImage", -18.96, -57.80, "/image/estacion-02.png", "Refinería Gualberto Villarroel", "<b>Refinería Gualberto Villarroel</b><br>Ubicación: Santa Cruz, Bolivia");
+            
+            if (routesFerroviarias != null && routesFerroviarias.Any())
+            {
+                foreach (var route in routesFerroviarias)
+                {
+                    if (route.IsDotted)
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDottedLine", route.Routes, route.Color, route.LineThickness);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawPolyline", route.Routes, route.Color, route.LineThickness);
+                    }
+
+                    if (route.Routes.Any())
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.First()[0],
+                            route.Routes.First()[1],
+                            $"Origen: {route.Name}",
+                            route.Color);
+
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.Last()[0],
+                            route.Routes.Last()[1],
+                            $"Destino: {route.Name}",
+                            route.Color);
+                    }
+                }
+            }
+
+            // 4. DIBUJAR MAPA CARRETERA
+            await JSRuntime.InvokeVoidAsync("createMap", "map-carretera-container", -17.0, -64.5, 6);
+            await JSRuntime.InvokeVoidAsync("addRefineryMarker");
+            await JSRuntime.InvokeVoidAsync("addRefineryCochabamba");
+            await JSRuntime.InvokeVoidAsync("addCarreteraVillamontes");
+            await JSRuntime.InvokeVoidAsync("addCarreteraMonteagudo");
+            await JSRuntime.InvokeVoidAsync("addCarreteraTrinidad");
+            await JSRuntime.InvokeVoidAsync("addCarreteraSucre");
+
+            await JSRuntime.InvokeVoidAsync("addCarreteraPotosi");
+            await JSRuntime.InvokeVoidAsync("addCarreteraBermejo");
+            await JSRuntime.InvokeVoidAsync("addCarreteraVillazon");
+            await JSRuntime.InvokeVoidAsync("addCarreteraTupiza");
+            await JSRuntime.InvokeVoidAsync("addCarreteraUyuni");
+            await JSRuntime.InvokeVoidAsync("addCarreteraSenkata");
+            await JSRuntime.InvokeVoidAsync("addCarreteraOruro");
+
+            if (routesCarretera != null && routesCarretera.Any())
+            {
+                foreach (var route in routesCarretera)
+                {
+                    if (route.IsDotted)
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDottedLine", route.Routes, route.Color, route.LineThickness);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawPolyline", route.Routes, route.Color, route.LineThickness);
+                    }
+
+                    if (route.Routes.Any())
+                    {
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.First()[0],
+                            route.Routes.First()[1],
+                            $"Origen: {route.Name}",
+                            route.Color);
+
+                        await JSRuntime.InvokeVoidAsync("drawDotMarker",
+                            route.Routes.Last()[0],
+                            route.Routes.Last()[1],
+                            $"Destino: {route.Name}",
+                            route.Color);
+                    }
+                }
+            }
+        }
+
+    }
+
+    // private async Task CreateAndDrawMaps()
+    // {
+    //     await JSRuntime.InvokeVoidAsync("createMapWithRoutes",
+    //         "map-container-1", -17.0, -64.5, 6, routesDucteos);
+    //     await JSRuntime.InvokeVoidAsync("addRefineryMarker", "map-container-1");
+
+    //     // Mapa 2: Rutas 4-6
+    //     await JSRuntime.InvokeVoidAsync("createMapWithRoutes",
+    //         "map-container-2", -17.0, -64.5, 6, routesFluvials);
+    //     await JSRuntime.InvokeVoidAsync("addRefineryMarker", "map-container-2");
+
+    //     // // Mapa 3: Rutas 7-9
+    //     // await JSRuntime.InvokeVoidAsync("createMapWithRoutes",
+    //     //     "map-container-3", -17.0, -64.5, 6, map3Routes);
+
+    //     // // Mapa 4: Rutas 10+
+    //     // await JSRuntime.InvokeVoidAsync("createMapWithRoutes",
+    //     //     "map-container-4", -17.0, -64.5, 6, map4Routes);
+    // }
+
+    private async Task StartAnimation()
+    {
+        // var routeToAnimate = routesDucteos.FirstOrDefault();
+
+        // if (routeToAnimate != null)
+        // {
+        //     // NO LLAMAR A clearMap() AQUÍ.
+        //     // En su lugar, pasamos el ID del contenedor para que la función de JS sepa en qué mapa trabajar.
+        //     await JSRuntime.InvokeVoidAsync("animateRoute",
+        //         "map-ducteos-container", // <-- ID del mapa específico a animar
+        //         routeToAnimate.Routes,
+        //         routeToAnimate.Color,
+        //         routeToAnimate.LineThickness);
+        // }
+        //// Limpiar el mapa antes de iniciar la animación
+
+
+
+
+        // await JSRuntime.InvokeVoidAsync("clearMap");
+
+        // // Seleccionar la ruta a animar (en este caso, la primera)
+        var routeToAnimate = routesDucteos.FirstOrDefault();
+
+        if (routeToAnimate != null)
+        {
+            await JSRuntime.InvokeVoidAsync("animateRoute", routeToAnimate.Routes, routeToAnimate.Color, routeToAnimate.LineThickness);
+            //await JSRuntime.InvokeVoidAsync("animatePolyline", routeToAnimate.Routes, routeToAnimate.Color, routeToAnimate.LineThickness);
+        }
+
+        // var routeToAnimate = routesDucteos.FirstOrDefault();
+        // if (routeToAnimate != null)
+        // {
+        //     await JSRuntime.InvokeVoidAsync("animateRoute",
+        //         "map-ducteos-container",  // 👈 ahora le dices en qué mapa
+        //         routeToAnimate.Routes,
+        //         routeToAnimate.Color,
+        //         routeToAnimate.LineThickness);
+        // }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("clearMap");
+    }
+}
+

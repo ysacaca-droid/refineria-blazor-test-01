@@ -18,11 +18,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="NewFolder\" />
     <Folder Include="Pages\Footer\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\models\models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\ClientMap.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>
