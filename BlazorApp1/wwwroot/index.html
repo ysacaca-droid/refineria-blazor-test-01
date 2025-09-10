@@ -10,11 +10,43 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="BlazorApp1.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <style>
+        .custom-round-marker {
+            background: rgba(100, 180, 255, 0.85); /* Azul claro */
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Clústeres */
+        .custom-cluster {
+            background: rgba(50, 130, 255, 0.9);
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+
+            .custom-cluster div {
+                width: 40px;
+                height: 40px;
+                line-height: 38px;
+                border-radius: 50%;
+            }
+    </style>
+
 </head>
 
 <body>
@@ -34,6 +66,7 @@
 
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script src="js/site.js"></script>
 
     <!--<script src="js/googleMapsManager.js"></script>-->-->

@@ -101,3 +101,34 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+
+
+
+
+.custom-round-marker {
+    background: rgba(100, 180, 255, 0.85); /* Azul claro */
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Clústeres */
+.custom-cluster {
+    background: rgba(50, 130, 255, 0.9);
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid white;
+}
+
+    .custom-cluster div {
+        width: 40px;
+        height: 40px;
+        line-height: 38px;
+        border-radius: 50%;
+    }

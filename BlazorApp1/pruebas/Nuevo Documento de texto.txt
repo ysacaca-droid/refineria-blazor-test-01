@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Tipo Columna con Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1a73e8', // Un azul para botones o focos
+                        'light-blue-bg': '#e8f0fe', // Fondo claro para ciertos elementos
+                        'task-blue': '#dbeafe', // Azul para tareas
+                        'task-green': '#dcfce7', // Verde para tareas
+                        'task-orange': '#ffe4e6', // Rojo/Naranja para tareas
+                        'task-purple': '#e9d5ff', // Morado para tareas
+                        'task-yellow': '#fefce8', // Amarillo para tareas
+                        'task-pink': '#fae8ff', // Rosa para tareas
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS personalizado para los avatares apilados y barras de color */
+        .avatar-stack > img {
+            margin-left: -8px; /* Para superponer los avatares */
+            border: 2px solid white; /* Borde blanco alrededor de cada avatar */
+        }
+        .avatar-stack > img:first-child {
+            margin-left: 0; /* El primer avatar no tiene margen negativo */
+        }
+
+        /* Pequeñas barras de color lateral para las tareas */
+        .task-card {
+            position: relative;
+            padding-left: 1rem; /* Deja espacio para la barra de color */
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px; /* Ancho de la barra de color */
+            border-top-left-radius: 0.25rem; /* Hereda el radio del borde del padre */
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        /* Colores de las barras laterales */
+        .task-blue::before { background-color: #3b82f6; /* Tailwind blue-500 */ }
+        .task-green::before { background-color: #22c55e; /* Tailwind green-500 */ }
+        .task-orange::before { background-color: #ef4444; /* Tailwind red-500 */ }
+        .task-purple::before { background-color: #a855f7; /* Tailwind purple-500 */ }
+        .task-yellow::before { background-color: #eab308; /* Tailwind yellow-500 */ }
+        .task-pink::before { background-color: #ec4899; /* Tailwind pink-500 */ }
+
+        /* Estilos para el scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 antialiased h-screen flex">
+
+    <div class="w-16 bg-white flex flex-col items-center py-4 border-r border-gray-200">
+        <div class="mb-6">
+            <button class="p-2 rounded-lg bg-primary-blue text-white shadow-md">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"></path></svg>
+            </button>
+        </div>
+        <a href="#" class="p-3 text-gray-500 hover:bg-gray-100 rounded-lg mb-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 00-1 1v1a1 1 0 002 0V4a1 1 0 00-1-1zM9 8a1 1 0 000 2h2a1 1 0 000-2H9zM15 3a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z"></path><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4v7h14V8H3z" clip-rule="evenodd"></path></svg>
+        </a>
+        <a href="#" class="p-3 text-gray-500 hover:bg-gray-100 rounded-lg mb-2 bg-gray-100 text-primary-blue">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+        </a>
+        <a href="#" class="p-3 text-gray-500 hover:bg-gray-100 rounded-lg mb-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+        </a>
+        <a href="#" class="p-3 text-gray-500 hover:bg-gray-100 rounded-lg mb-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm3 0a1 1 0 000 2h.01a1 1 0 100-2H13zm-3 4a1 1 0 000 2h.01a1 1 0 100-2H10zm3 0a1 1 0 000 2h.01a1 1 0 100-2H13z" clip-rule="evenodd"></path></svg>
+        </a>
+        </div>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="bg-white p-4 flex items-center justify-between border-b border-gray-200">
+            <div class="flex items-center">
+                <span class="text-xl font-bold mr-4">April</span>
+                <div class="flex items-center space-x-2">
+                    <button class="p-2 rounded-lg bg-primary-blue text-white text-sm">Today</button>
+                    <button class="p-2 rounded-full text-gray-600 hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <button class="p-2 rounded-full text-gray-600 hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="text-lg font-semibold flex items-center space-x-2">
+                <span>Waiting list</span> <span class="bg-primary-blue text-white text-xs px-2 py-1 rounded-full">5</span>
+                <button class="p-2 rounded-lg text-primary-blue hover:bg-light-blue-bg">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden">
+            <div class="flex-1 grid grid-cols-4 gap-4 p-4 overflow-x-auto overflow-y-auto">
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between text-sm mb-2 px-2">
+                        <span class="font-bold text-lg">10 Tue</span>
+                        <span class="text-gray-500">45m</span>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Define target audiences for this campaign</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>1:00h | Due today</span>
+                            </div>
+                            <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed1" alt="Avatar">
+                            </div>
+                        </div>
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Develop campaign messaging draft</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>3:00h | Due tomorrow</span>
+                            </div>
+                             <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed2" alt="Avatar">
+                            </div>
+                        </div>
+                         <div class="bg-task-green rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Reach Consensus on campaign messaging</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>1:00h</span>
+                            </div>
+                            <span class="inline-block bg-white text-gray-700 text-xs px-2 py-1 rounded-full mt-2">Feedback</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between text-sm mb-2 px-2">
+                        <span class="font-bold text-lg">11 Wed</span>
+                        <span class="text-gray-500">0m</span>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <div class="bg-task-orange rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Design campaign creative (general)</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>0:00h | Due tomorrow</span>
+                            </div>
+                            <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed3" alt="Avatar">
+                            </div>
+                        </div>
+                        <div class="bg-task-pink rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Contact Outdoor vendor and request a proposal</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>2:00h | 3 days left</span>
+                            </div>
+                            <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed4" alt="Avatar">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed5" alt="Avatar">
+                            </div>
+                        </div>
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Write a video script</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>2:30h | 6 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between text-sm mb-2 px-2">
+                        <span class="font-bold text-lg">12 Thu</span>
+                        <span class="text-gray-500">30m</span>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <div class="bg-task-orange rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Design a landing page</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>7:00h | 3 days left</span>
+                            </div>
+                            <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed6" alt="Avatar">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed7" alt="Avatar">
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card border border-red-300">
+                             <div class="flex items-center text-red-600 mb-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span class="text-red-600">Blocked</span>
+                            </div>
+                            <p class="font-semibold text-gray-800">Test the Landing Page</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>1:30h</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-pink rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Find a video production company</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>0:00h</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Write ad copy for Facebook ads</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>2:30h | 6 days left</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-yellow rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">13:00 - 13:30</p>
+                            <p class="text-gray-600 mt-1">Project status update meeting</p>
+                            <div class="flex justify-end mt-2 avatar-stack">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed8" alt="Avatar">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed9" alt="Avatar">
+                                <img class="w-6 h-6 rounded-full" src="https://api.lorem.space/image/face?w=120&h=120&hash=seed10" alt="Avatar">
+                            </div>
+                        </div>
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Write ad copy for Google Ads</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>2:30h | 6 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between text-sm mb-2 px-2">
+                        <span class="font-bold text-lg">13 Fri</span>
+                        <span class="text-gray-500">15m</span>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Develop a landing page</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>7:00h | 6 days left</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-pink rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Design Facebook banners</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>1:30h | 3 days left</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-orange rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Design Google Ads banners</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>1:30h | 3 days left</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-pink rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Design Outdoor banners</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>2:00h | 3 days left</span>
+                            </div>
+                        </div>
+                        <div class="bg-task-blue rounded-lg shadow-sm p-3 text-sm task-card">
+                            <p class="font-semibold text-gray-800">Approve banners</p>
+                            <div class="flex items-center text-gray-600 mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                <span>0:45h</span>
+                            </div>
+                             <span class="inline-block bg-white text-gray-700 text-xs px-2 py-1 rounded-full mt-2">Feedback</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-80 bg-light-blue-bg border-l border-gray-200 flex-shrink-0 p-4 overflow-y-auto">
+                <div class="flex flex-col space-y-3">
+                    <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card">
+                        <p class="font-semibold text-gray-800">Run A/B Test on Landing page</p>
+                        <div class="flex items-center text-gray-600 mt-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            <span>2:00h</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card">
+                        <p class="font-semibold text-gray-800">Send visual materials and specifications to Outdoor...</p>
+                        <div class="flex items-center text-gray-600 mt-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            <span>0:30h</span>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card">
+                        <p class="font-semibold text-gray-800">Set up the target audience in Facebook Business Manager</p>
+                        <div class="flex items-center text-gray-600 mt-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                        <span>1:30h | 8 days left</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card">
+                        <p class="font-semibold text-gray-800">Set up Facebook Ads campaigns</p>
+                        <div class="flex items-center text-gray-600 mt-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            <span>4:00h | 8 days left</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-3 text-sm task-card">
+                        <p class="font-semibold text-gray-800">Check the final campaign setup</p>
+                        <div class="flex items-center text-gray-600 mt-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            <span>1:30h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
