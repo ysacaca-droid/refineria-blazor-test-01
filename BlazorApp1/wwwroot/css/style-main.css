@@ -1,0 +1,25 @@
+﻿/*
+ * Estos estilos modifican los colores de los clusters.
+ * Los rangos numéricos corresponden a los definidos en el código JS.
+ * Pequeño: < 10 marcadores (Verde)
+ * Mediano: 10-99 marcadores (Amarillo)
+ * Grande: >= 100 marcadores (Naranja)
+ */
+.my-marker-cluster-small {
+    background-color: rgba(69, 186, 75, 0.6) !important; /* Verde */
+}
+
+.my-marker-cluster-medium {
+    background-color: rgba(255, 255, 0, 0.6) !important; /* Amarillo */
+}
+
+.my-marker-cluster-large {
+    background-color: rgba(255, 165, 0, 0.6) !important; /* Naranja */
+}
+
+/* Estilo para el texto dentro del cluster */
+.marker-cluster div {
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+}

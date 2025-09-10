@@ -1,0 +1,84 @@
+﻿@page "/formularioSolicitudTransportista"
+
+<h3>Solicitud de Formulario</h3>
+
+<div class="card p-4 shadow-sm">
+    <h2 class="text-center mb-4">Solicitud de Postulacion Para el Transporte de Gasolina</h2>
+    @* <h4 class="text-center text-muted mb-4">Gasolinera XYZ</h4> *@
+
+    <form action="#" method="POST">
+
+        <div class="form-section">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Refineria:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="Refinería Guillermo Elder Bell" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label for="apellidos" class="form-label">Direccion</label>
+                    <input type="text" class="form-control" id="apellidos" value="Av Santos Dumont, Santa Cruz de la Sierra" name="apellidos" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" value="3 3586888" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" value="ypfb-refineria@ypfb.com.bo" disabled>
+                </div>
+                @* <div class="col-md-6">
+                    <label for="fechaNacimiento" class="form-label">Cantidad de Sisternas</label>
+                    <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
+                </div> *@
+                @* <div class="col-md-6">
+                    <label for="apellidos" class="form-label">Cantidad de Sisternas</label>
+                    <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                </div> *@
+                
+            </div>
+        </div>
+
+        <div class="form-section" style="margin-top: 10px;">
+            @* <h5 class="mb-3">2. Disponibilidad</h5> *@
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="turnoPreferido" class="form-label">Tipo de Transporte:</label>
+                    <select id="turnoPreferido" name="turnoPreferido" class="form-select">
+                        <option selected>Selecciona una opción</option>
+                        <option value="matutino">Sisterna</option>
+                        <option value="vespertino">Ducto</option>
+                        <option value="nocturno">Fluvial</option>
+                        <option value="indistinto">Ferroviario</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="inicioDisponibilidad" class="form-label">Responsable:</label>
+                    <select id="turnoPreferido" name="turnoPreferido" class="form-select">
+                        <option selected>Selecciona una opción</option>
+                        <option value="matutino">Ana Lucía Pérez Gómez</option>
+                        <option value="vespertino">Carlos Daniel Ramírez Castro</option>
+                        <option value="nocturno">Sofía Alejandra Vargas Mendieta</option>
+                        <option value="indistinto">Javier Ernesto López Fuentes</option>
+                    </select>
+                </div>
+                @* <div class="col-12 mt-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="manejo" name="manejo" value="si">
+                        <label class="form-check-label" for="manejo">
+                            ¿Sabes manejar automóvil?
+                        </label>
+                    </div>
+                </div> *@
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Enviar Solicitud</button>
+        </div>
+
+    </form>
+</div>
+
+@code {
+
+}

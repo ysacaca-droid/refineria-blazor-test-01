@@ -14,5 +14,6 @@ namespace models
         public double Longitude { get; set; }
         public string Type { get; set; }
         public string Image { get; set; }
+        //public string Color { get; set; }
     }
 }
