@@ -129,9 +129,9 @@ function drawAllMarkers() {
                 const divIcon = L.divIcon({
                     // className: 'my-custom-div-icon',
                     // html: '<div style="background-color: #ff5733; border-radius: 50%; border: 3px solid white;"></div>',
-                    html: '<div style="background-color: #CBDF90; border-radius: 50%; border: 3px solid white;"></div>',
-                    iconSize: [10, 10],
-                    iconAnchor: [5, 5]
+                    html: '<div style="background-color: #CBDF90; width:20px; height: 20px; border-radius: 50%; border: 3px solid white;"></div>',
+                    iconSize: [20, 20],
+                    //iconAnchor: [20, 20]
                 });
                 marker = L.marker([punto.lat, punto.lng], { icon: divIcon });
                 break;
@@ -198,9 +198,10 @@ function drawAllMarkersInput(drawPoint) {
             case "divIcon":
                 const divIcon = L.divIcon({
                     className: 'my-custom-div-icon',
-                    html: '<div style="background-color: #ff5733; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white;"></div>',
-
-                    iconAnchor: [15, 15]
+                    //width: 20px; height: 20px;
+                    html: '<div style="background-color: #ff5733; width: 15px; height: 15px; border-radius: 50%; border: 3px solid white;"></div>',
+                    //iconSize: [40, 40],
+                    iconAnchor: [10, 10]
                 });
                 marker = L.marker([punto.latitude, punto.longitude], { icon: divIcon });
                 break;
