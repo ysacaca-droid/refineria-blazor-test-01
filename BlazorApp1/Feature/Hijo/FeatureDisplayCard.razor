@@ -1,0 +1,28 @@
+﻿<h3>FeatureDisplayCard</h3>
+
+<h3>@Title</h3>
+<h3>@Value</h3>
+
+<h1>Button</h1>
+
+<div @onclick="HandleTaskCompleted">
+    <span>@TaskName gigi</span>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }    
+    [Parameter]
+    public string TaskName { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnTaskCompleted { get; set; }
+
+    private async Task HandleTaskCompleted()
+    {
+        TaskName = "kiki";
+        await OnTaskCompleted.InvokeAsync(TaskName);
+    }
+}
