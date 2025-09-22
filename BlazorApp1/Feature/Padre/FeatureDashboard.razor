@@ -1,0 +1,21 @@
+﻿@page "/featureDashboard"
+@using BlazorApp1.Feature.Hijo
+
+<h3>FeatureDashboard</h3>
+
+
+
+<FeatureDisplayCard Title="pendejos" Value="pero que pendejo" OnTaskCompleted="RemoveTask" />
+
+<h1>Hijos</h1>
+<h1>respuesta de hijos @ChangeValue</h1>
+
+@code {
+    
+    public string ChangeValue { get; set; }
+
+    private void RemoveTask(string valueInto)
+    {
+        ChangeValue = valueInto;
+    }
+}
