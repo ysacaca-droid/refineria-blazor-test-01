@@ -59,10 +59,71 @@
         .use-case-table th {
             background-color: #f1f5f9;
         }
+        /* Estilos para los botones de exportación */
+.export-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+.export-btn {
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.pdf-btn {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+}
+.word-btn {
+    background-color: #2b579a;
+    color: white;
+    border: none;
+}
+
+/* Estilos para la impresión/exportación */
+@media print {
+    .export-buttons {
+        display: none;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 100%;
+        padding: 0;
+    }
+}
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Botones de exportación -->
+<div class="export-buttons">
+    <button id="exportPdf" class="export-btn pdf-btn">
+        <i class="fas fa-file-pdf"></i> PDF
+    </button>
+    <button id="exportWord" class="export-btn word-btn">
+        <i class="fas fa-file-word"></i> Word
+    </button>
+</div>
+    <div class="container mx-auto px-4 py-8 pt-20 max-w-6xl" id="content-to-export">
         <!-- Header -->
         <header class="bg-gradient-to-r from-[#0D2A57] to-[#0A1F3F] text-white p-8 rounded-xl shadow-lg mb-8">
             <div class="flex items-center justify-between">
@@ -700,4 +761,37 @@
         </section> -->
     </div>
 </body>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Exportar a PDF
+    document.getElementById('exportPdf').addEventListener('click', function() {
+        const element = document.getElementById('content-to-export');
+        const options = {
+            margin: 10,
+            filename: 'Documento_Arquitectura_Sistema_Distribucion.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        html2pdf().set(options).from(element).save();
+    });
+
+    // Exportar a Word
+    document.getElementById('exportWord').addEventListener('click', function() {
+        const element = document.getElementById('content-to-export');
+        const content = element.innerHTML;
+        
+        // Crear documento Word
+        const converted = html-docx.asBlob(content, {
+            orientation: 'portrait',
+            margins: { top: 720, right: 720, bottom: 720, left: 720 }
+        });
+        
+        saveAs(converted, 'Documento_Arquitectura_Sistema_Distribucion.docx');
+    });
+});
+</script>
+
 </html>
