@@ -1,1 +1,48 @@
 INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('2', '33', '26', '1', 'Refinería G. Elder Bell - Trinidad', '1', '1', '15000.00', 'm³', '101', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-18 22:14:28', '2025-09-18 22:14:28', '0', 'Refinería G. Elder Bell - Trinidad', '20', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('3', '33', '27', '1', 'Refinería G. Elder Bell - San Jose', '2', '2', '22000.75', 'm³', '102', 'Km', '18000.25', 'Bs', 'admin', 'S/N', '2025-09-18 22:14:28', '2025-09-18 22:14:28', '0', 'Refinería G. Elder Bell - San Jose', '16', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('4', '33', '30', '1', 'Refinería G. Elder Bell - Camiri', '3', '3', '8500.50', 'm³', '103', 'Km', '12500.75', 'Bs', 'admin', 'S/N', '2025-09-18 22:14:28', '2025-09-18 22:14:28', '0', 'Refinería G. Elder Bell - Camiri', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('5', '33', '29', '1', 'Refinería G. Elder Bell - Monteagudo', '4', '4', '4500.25', 'm³', '104', 'Km', '9500.30', 'Bs', 'admin', 'S/N', '2025-09-18 22:14:28', '2025-09-18 22:14:28', '1', 'Refinería G. Elder Bell - Monteagudo', '24', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('6', '33', '34', '1', 'Refinería G. Elder Bell - Refinería G. Villarroel', '5', '1', '15000.00', 'm³', '101', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-18 22:16:29', '2025-09-18 22:16:29', '0', 'Refinería G. Elder Bell - Refinería G. Villarroel', '12', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('8', '34', '19', '1', 'Refinería G. Villarroel - Oruro', '6', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-18 22:25:24', '2025-09-18 22:25:24', '0', 'Refinería G. Villarroel - Potosi', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('9', '19', '20', '1', 'Oruro - Uyuni', '6', '1', '1200.00', 'm³', '40', 'Km', '12000.00', 'Bs', 'admin', 'S/N', '2025-09-18 22:28:08', '2025-09-18 22:28:08', '0', 'Refinería G. Villarroel - Potosi', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('12', '20', '6', '1', 'Uyuni - Potosi', '6', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-18 22:33:07', '2025-09-18 22:33:07', '0', 'Refinería G. Villarroel - Potosi', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('13', '34', '19', '1', 'Refinería G. Villarroel - Oruro', '7', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-18 23:25:09', '2025-09-18 23:25:09', '0', 'Refinería G. Villarroel - Potosi', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('14', '19', '6', '1', 'Oruro - Potosi', '7', '2', '8000.00', 'm³', '100', 'Km', '27000.50', 'Bs', 'admin', 'S/N', '2025-09-18 23:25:09', '2025-09-18 23:25:09', '0', 'Refinería G. Villarroel - Potosi', '18', 'horas', '1');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('16', '34', '7', '1', 'Refinería G. Villarroel - Puerto Villarroel', '8', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-22 13:27:05', '2025-09-22 13:27:05', '1', 'Refinería G. Villarroel - Puerto Villarroel', '20', 'horas', '4');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('17', '34', '19', '1', 'Refinería G. Villarroel - Oruro', '9', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-22 13:33:26', '2025-09-22 13:33:26', '1', 'Refinería G. Villarroel - Oruro', '20', 'horas', '4');  INSERT INTO prog.RUTA (Id, PlantTypeOrigenId, PlantTypeDestinationId, ProductId, [Name], Secuence, OrderNumber, Volume, VolumeType, [Route], RouteType, Cost, CostType, UserCreate, UserModification, DateCreate, DateModification, [State], NameGroup, [Time], TimeType, TransportId) VALUES ('18', '34', '19', '1', 'Refinería G. Villarroel - Oruro', '7', '1', '15000.00', 'm³', '80', 'Km', '25000.50', 'Bs', 'admin', 'S/N', '2025-09-23 08:02:30', '2025-09-23 08:02:30', '1', 'Refinería G. Villarroel - Oruro', '8', 'horas', '1');  
+
+
+
+
+ALTER PROCEDURE [prog].[GetRoutActive]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        r.[Id],
+        r.[PlantTypeOrigenId],
+        r.[PlantTypeDestinationId],
+        r.[ProductId],
+        r.[Name],
+        r.[Secuence],
+        r.[OrderNumber],
+        r.[Volume],
+        r.[VolumeType],
+        r.[Route],
+        r.[RouteType],
+        r.[Cost],
+        r.[CostType],
+        r.[Time],
+        r.[TimeType],
+        r.[NameGroup],
+        t.[Name] as TransportName,
+        -- Nombres de las plantas de origen y destino
+        po.[Name] AS OrigenName,
+        pd.[Name] AS DestinationName,
+        -- Nombre del producto
+        pr.[Name] AS ProductName
+    FROM 
+        [prog].[RUTA] r
+    INNER JOIN 
+        [prog].[PLANTAS] po ON r.[PlantTypeOrigenId] = po.[Id]
+    INNER JOIN 
+        [prog].[PLANTAS] pd ON r.[PlantTypeDestinationId] = pd.[Id]
+    INNER JOIN 
+        [prog].[PRODUCTO] pr ON r.[ProductId] = pr.[Id]
+    INNER JOIN
+        [prog].[TRANSPORT_MODE] t ON r.[TransportId] = t.[Id]
+    WHERE 
+        r.[State] = 1
+    ORDER BY 
+        r.[Secuence], r.[OrderNumber];
+END
