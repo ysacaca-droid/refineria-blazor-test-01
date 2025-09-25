@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arquitectura - Sistema Distribución Combustibles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .architecture-diagram {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 30px 0;
+      }
+      .layer {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .arrow {
+        text-align: center;
+        font-size: 24px;
+        color: #3b82f6;
+        margin: 10px 0;
+      }
+      .component {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+      }
+      .component:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+      .pattern-card {
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+      }
+      .pattern-card:hover {
+        transform: translateX(5px);
+      }
+      .db-table {
+        border-left: 4px solid;
+        margin: 10px 0;
+        padding: 10px 15px;
+      }
+      .use-case-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      .use-case-table th,
+      .use-case-table td {
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        text-align: left;
+      }
+      .use-case-table th {
+        background-color: #f1f5f9;
+      }
+      .sequence-diagram {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+      .actor {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #dbeafe;
+        border-radius: 5px;
+        margin: 5px;
+        font-weight: 600;
+      }
+      .system-component {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #dcfce7;
+        border-radius: 5px;
+        margin: 5px;
+        font-weight: 600;
+      }
+      .interaction {
+        margin: 15px 0;
+        padding-left: 20px;
+        border-left: 2px dashed #94a3b8;
+      }
+      .export-buttons {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+      }
+      .export-btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+      .pdf-btn {
+        background-color: #e53e3e;
+        color: white;
+        border: none;
+      }
+      .word-btn {
+        background-color: #2b579a;
+        color: white;
+        border: none;
+      }
+      @media print {
+        .export-buttons {
+          display: none;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 100%;
+          padding: 0;
+        }
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Botones de exportación -->
+    <div class="export-buttons">
+      <button id="exportPdf" class="export-btn pdf-btn">
+        <i class="fas fa-file-pdf"></i> PDF
+      </button>
+      <button id="exportWord" class="export-btn word-btn">
+        <i class="fas fa-file-word"></i> Word
+      </button>
+    </div>
+    <div
+      class="container mx-auto px-4 py-8 pt-20 max-w-6xl"
+      id="content-to-export"
+    >
+      <!-- Header -->
+      <header
+        class="bg-gradient-to-r from-[#0D2A57] to-[#0A1F3F] text-white p-8 rounded-xl shadow-lg mb-8"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-4xl font-bold">
+              Documento de Arquitectura de Software
+            </h1>
+            <p class="text-2xl font-bold mt-2">
+              Programación de Distribución Logística
+            </p>
+            <p class="mt-1 text-blue-100 text-sm">
+              Versión 1.0 | Última actualización: 20 Sept 2023
+            </p>
+          </div>
+          <div class="p-3">
+            <img src="icon-refineria-02.png" class="w-40 h-26" />
+          </div>
+        </div>
+      </header>
+
+      <!-- Índice -->
+      <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-800">
+          Índice del Documento
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <a
+            href="#introduccion"
+            class="bg-blue-50 hover:bg-blue-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+            <p class="mt-1 text-sm">Introducción</p>
+          </a>
+          <a
+            href="#procesos-actuales"
+            class="bg-red-50 hover:bg-red-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-exchange-alt text-red-600 text-xl"></i>
+            <p class="mt-1 text-sm">Procesos Actuales</p>
+          </a>
+          <a
+            href="#requisitos"
+            class="bg-green-50 hover:bg-green-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-list-alt text-green-600 text-xl"></i>
+            <p class="mt-1 text-sm">Requisitos</p>
+          </a>
+          <a
+            href="#tecnologias"
+            class="bg-purple-50 hover:bg-purple-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-code text-purple-600 text-xl"></i>
+            <p class="mt-1 text-sm">Tecnologías</p>
+          </a>
+          <a
+            href="#arquitectura"
+            class="bg-yellow-50 hover:bg-yellow-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-sitemap text-yellow-600 text-xl"></i>
+            <p class="mt-1 text-sm">Arquitectura</p>
+          </a>
+          <a
+            href="#casos-uso"
+            class="bg-indigo-50 hover:bg-indigo-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-project-diagram text-indigo-600 text-xl"></i>
+            <p class="mt-1 text-sm">Casos de Uso</p>
+          </a>
+          <a
+            href="#modelo-datos"
+            class="bg-teal-50 hover:bg-teal-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-database text-teal-600 text-xl"></i>
+            <p class="mt-1 text-sm">Modelo de Datos</p>
+          </a>
+          <a
+            href="#seguridad"
+            class="bg-orange-50 hover:bg-orange-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-shield-alt text-orange-600 text-xl"></i>
+            <p class="mt-1 text-sm">Seguridad</p>
+          </a>
+          <a
+            href="#despliegue"
+            class="bg-pink-50 hover:bg-pink-100 p-3 rounded-lg text-center"
+          >
+            <i class="fas fa-cloud-upload-alt text-pink-600 text-xl"></i>
+            <p class="mt-1 text-sm">Despliegue</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- Introducción -->
+      <section id="introduccion" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          1. Introducción
+        </h2>
+        <div class="flex flex-col gap-6">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Propósito</h3>
+            <p class="text-gray-700 mb-4">
+              Este documento describe la arquitectura de software del sistema de
+              <span class="font-semibold text-blue-700"
+                >Programación de Distribución de Combustibles</span
+              >
+              para YPFB-Refinación.
+            </p>
+
+            <p class="text-gray-700 mb-4">
+              El objetivo principal del proyecto es
+              <span class="font-semibold text-blue-700"
+                >centralizar en una Base de Datos</span
+              >
+              toda la información y las operaciones que se realizan al momento
+              de elaborar la Programación de Distribución de Combustibles,
+              reemplazando los procesos manuales actuales basados en planillas
+              Excel.
+            </p>
+
+            <p class="text-gray-700 mb-4">
+              La aplicación será desarrollada con
+              <span class="font-semibold text-blue-700"
+                >tecnologías actuales y ampliamente demandadas</span
+              >
+              en el mercado de desarrollo de software, garantizando
+              escalabilidad, mantenibilidad y seguridad.
+            </p>
+
+            <p class="text-gray-700">
+              YPFB-Refinación actualmente distribuye a sus clientes potenciales
+              los siguientes productos:
+            </p>
+
+            <div class="mt-6">
+              <div class="flex flex-wrap gap-2 mt-4">
+                <span
+                  class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-gas-pump mr-1 text-blue-600"></i> Gasolina
+                </span>
+                <span
+                  class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-flask mr-1 text-indigo-600"></i> Gasolina
+                  Especial
+                </span>
+                <span
+                  class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-fire mr-1 text-purple-600"></i> Gas
+                </span>
+                <span
+                  class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-vial mr-1 text-pink-600"></i> Solvente
+                </span>
+                <span
+                  class="bg-rose-100 text-rose-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-tint mr-1 text-rose-600"></i> Aguarras
+                </span>
+                <span
+                  class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-oil-can mr-1 text-amber-600"></i> Kerosene
+                </span>
+                <span
+                  class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-industry mr-1 text-gray-600"></i> Diésel
+                </span>
+                <span
+                  class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-fire-alt mr-1 text-teal-600"></i> Butano
+                </span>
+                <span
+                  class="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-box mr-1 text-cyan-600"></i> GBC
+                </span>
+                <span
+                  class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center"
+                >
+                  <i class="fas fa-crown mr-1 text-blue-600"></i> Gasolina
+                  Premium Plus
+                </span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Alcance</h3>
+            <div class="flex flex-row w-full bg-white gap-4">
+              <div class="w-1/2 mb-6 rounded-xl shadow-md p-6">
+                <h3
+                  class="text-lg font-semibold text-blue-700 mb-2 flex items-center"
+                >
+                  <i class="fas fa-tasks mr-2"></i> Módulo Administrativo
+                </h3>
+                <ul class="list-disc pl-5 space-y-1 ml-2">
+                  <li class="text-gray-700">
+                    <span class="font-medium">Gestión de productos:</span>
+                    Gasolina, Gasolina Especial, Gas, Solvente, Aguarras,
+                    Kerosene, Diésel, Butano
+                  </li>
+                  <li class="text-gray-700 font-medium">
+                    Gestión de plazas/plantas (Clientes)
+                  </li>
+                  <li class="text-gray-700 font-medium">Gestión de Rutas</li>
+                  <li class="text-gray-700 font-medium">
+                    Gestión del tipo de Transporte
+                  </li>
+                </ul>
+              </div>
+              <div class="rounded-xl shadow-md p-6">
+                <h3
+                  class="text-lg font-semibold text-green-700 mb-2 flex items-center"
+                >
+                  <i class="fas fa-calendar-alt mr-2"></i> Módulo de
+                  Programación
+                </h3>
+                <ul class="list-disc pl-5 space-y-2 ml-2">
+                  <li class="text-gray-700">
+                    <span class="font-medium">Programación mensual:</span>
+                    Programar la distribución de los productos de YPFB-Refineria
+                    a las plazas o plantas (Clientes) con capacidad de ajustes
+                    en tiempo real.
+                  </li>
+                  <li class="text-gray-700">
+                    <span class="font-medium"
+                      >Programación diaria y Ajustes en tiempo real:</span
+                    >
+                    Programar la distribución de los productos diario y ajustes
+                    en tiempo real.
+                  </li>
+                  <li class="text-gray-700">
+                    <span class="font-medium"
+                      >Visualización de rutas en mapas interactivos</span
+                    >
+                  </li>
+                  <li class="text-gray-700">
+                    <span class="font-medium"
+                      >Sistema de notificaciones para cambios en las
+                      planificaciones:</span
+                    >
+                    Se debe enviar un correo indicando los ajustes realizados,
+                    tanto a YPFB-Refineria y plantas
+                  </li>
+                  <li class="text-gray-700">
+                    Dashboard interactivo de Programación mensual y con filtros
+                  </li>
+                  <li class="text-gray-700">Generación de reportes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mt-8 mb-3">
+          Objetivos del Sistema
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-blue-700">Automatización</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm">
+              <li>Reemplazar procesos manuales en Excel</li>
+              <li>Documentación y datos Centralizados</li>
+              <li>Reducción de tiempos de procesamiento</li>
+              <li>Envió de correos electrónicos Automatizados</li>
+            </ul>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-green-700">Optimización</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm">
+              <li>Gestión eficiente de rutas</li>
+              <li>Reducción de costos operativos</li>
+            </ul>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-purple-700">Visualización</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm">
+              <li>Dashboard interactivo</li>
+              <li>Mapas de rutas en tiempo real</li>
+              <li>Reportes</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Procesos Actuales -->
+      <section
+        id="procesos-actuales"
+        class="bg-white p-8 rounded-xl shadow-md mb-8"
+      >
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          2. Procesos Actuales
+        </h2>
+
+        <div class="bg-red-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold text-red-700 mb-4">
+            Situación Actual
+          </h3>
+          <p class="mb-4">
+            El proceso actual de planificación y distribución de combustibles se
+            realiza mediante métodos manuales que presentan varias limitaciones:
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-semibold text-red-800 mb-3">
+                Problemas Identificados
+              </h4>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>Coordinación manual mediante correo electrónico</li>
+                <li>Distribución manual mediante registros en Excel</li>
+                <li>Demora de 3 días hábiles en el armado de Excel</li>
+                <li>Planificación en plantillas no amigables</li>
+                <li>Falta de visibilidad en tiempo real</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-red-800 mb-3">Consecuencias</h4>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>Ineficiencia en la planificación</li>
+                <li>Errores en la distribución</li>
+                <li>Falta de actualizaciones en tiempo real</li>
+                <li>Dificultad para realizar ajustes</li>
+                <li>Pérdida de tiempo en procesos manuales</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Flujo Actual</h3>
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li class="font-semibold">
+              Reunión mensual para coordinar montos de distribución por cliente
+            </li>
+            <li class="font-semibold">
+              Creación de la planilla Excel "Programacion PRODE Comercial"
+            </li>
+            <li class="font-semibold">
+              Análisis manual de rutas considerando transporte, costos,
+              distancia y tiempo
+            </li>
+            <li class="font-semibold">
+              Planilla final con fechas y cantidades por producto
+            </li>
+            <li class="font-semibold">
+              Modificaciones durante el mes que no se reflejan en la planilla
+              original
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Requisitos -->
+      <section id="requisitos" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          3. Requisitos del Sistema
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">
+              Requisitos Funcionales
+            </h3>
+
+            <div class="bg-blue-50 p-5 rounded-lg mb-4">
+              <h4 class="font-semibold text-blue-800 text-lg mb-3">
+                Módulo Administrativo
+              </h4>
+              <ul class="list-disc pl-5 space-y-2 text-sm">
+                <li>
+                  Gestión de productos: AV Gas, Jet Fuel, Solvente 3 Aguarras,
+                  Kerosene, Diésel Oil, Butano, Gas Oil, GLP, GLP Importado
+                </li>
+                <li>Gestión de plazas/plantas (Clientes)</li>
+                <li>Gestión de Rutas</li>
+                <li>Gestión del tipo de Transporte</li>
+              </ul>
+            </div>
+
+            <div class="bg-green-50 p-5 rounded-lg mb-4">
+              <h4 class="font-semibold text-green-800 text-lg mb-3">
+                Módulo de Programación
+              </h4>
+              <ul class="list-disc pl-5 space-y-2 text-sm">
+                <li>Programación mensual de distribución</li>
+                <li>Programación diaria y ajustes en tiempo real</li>
+                <li>Visualización de rutas en mapas interactivos</li>
+                <li>
+                  Sistema de notificaciones para cambios en las planificaciones
+                </li>
+                <li>
+                  Dashboard interactivo de Programación mensual con filtros
+                </li>
+                <li>Generación de reportes</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">
+              Requisitos No Funcionales
+            </h3>
+
+            <div class="bg-purple-50 p-5 rounded-lg mb-4">
+              <h4 class="font-semibold text-purple-800 text-lg mb-3">
+                Rendimiento y Disponibilidad
+              </h4>
+              <ul class="list-disc pl-5 space-y-2 text-sm">
+                <li>Medir los tiempos de respuesta</li>
+                <li>
+                  Disponibilidad las 24 horas o parametrización de horas activas
+                </li>
+                <li>
+                  Almacenamiento en base de datos con tablas históricas y
+                  limpieza de tablas principales cada cierto tiempo, lo sugerido
+                  es 6 meses, el tiempo tiene que ser parametrizable.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-yellow-50 p-5 rounded-lg mb-4">
+              <h4 class="font-semibold text-yellow-800 text-lg mb-3">
+                Seguridad
+              </h4>
+              <ul class="list-disc pl-5 space-y-2 text-sm">
+                <li>Autenticación con Google o correo electrónico</li>
+                <li>Seguridad JWT entre Frontend y Backend</li>
+                <li>
+                  Usuario con roles específicos y schema propio en base de datos
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tecnologías -->
+      <section id="tecnologias" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          4. Tecnologías Utilizadas
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">
+              Tecnologías Principales
+            </h3>
+
+            <div class="bg-blue-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fab fa-microsoft text-blue-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-blue-800">
+                  Frontend: Blazor WebAssembly
+                </h4>
+              </div>
+              <p class="text-sm">
+                Framework moderno para aplicaciones web interactivas con C#.
+              </p>
+            </div>
+
+            <div class="bg-green-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fab fa-microsoft text-green-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-green-800">
+                  Backend: ASP.NET Core 8 Web API
+                </h4>
+              </div>
+              <p class="text-sm">
+                Framework para construir APIs RESTful robustas y escalables.
+              </p>
+            </div>
+
+            <div class="bg-purple-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fas fa-database text-purple-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-purple-800">
+                  Base de datos: SQL Server
+                </h4>
+              </div>
+              <p class="text-sm">
+                Sistema de gestión de bases de datos relacional.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">
+              Tecnologías Complementarias
+            </h3>
+
+            <div class="bg-yellow-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fas fa-paint-brush text-yellow-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-yellow-800">Tailwind CSS</h4>
+              </div>
+              <p class="text-sm">
+                Framework de CSS para diseño moderno y responsive.
+              </p>
+            </div>
+
+            <div class="bg-red-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fas fa-map-marked-alt text-red-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-red-800">Leaflet</h4>
+              </div>
+              <p class="text-sm">
+                Librería JavaScript para mapas interactivos.
+              </p>
+            </div>
+
+            <div class="bg-indigo-50 p-5 rounded-lg mb-4">
+              <div class="flex items-center mb-3">
+                <i class="fas fa-lock text-indigo-600 text-2xl mr-3"></i>
+                <h4 class="font-semibold text-indigo-800">JWT</h4>
+              </div>
+              <p class="text-sm">JSON Web Tokens para autenticación segura.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Arquitectura del Sistema -->
+      <section id="arquitectura" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          5. Arquitectura del Sistema
+        </h2>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">
+          Diagrama de Arquitectura
+        </h3>
+
+        <div class="architecture-diagram">
+          <!-- Capa de Presentación -->
+          <div class="layer bg-blue-100">
+            <h4 class="font-semibold text-blue-800 text-lg mb-3">
+              Capa de Presentación (Blazor WebAssembly)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="component bg-white">
+                <h5 class="font-semibold">Componentes Razor</h5>
+                <p class="text-sm">
+                  Interfaz de usuario modular y reutilizable
+                </p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Páginas</h5>
+                <p class="text-sm">Vistas principales de la aplicación</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Layouts</h5>
+                <p class="text-sm">Estructuras de diseño consistentes</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arrow">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+
+          <!-- Capa de Aplicación -->
+          <div class="layer bg-green-100">
+            <h4 class="font-semibold text-green-800 text-lg mb-3">
+              Capa de Aplicación (API REST)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="component bg-white">
+                <h5 class="font-semibold">Controladores</h5>
+                <p class="text-sm">
+                  Endpoints para cada módulo (Plantas, Productos, Rutas)
+                </p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Servicios de Aplicación</h5>
+                <p class="text-sm">Lógica de negocio y casos de uso</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">DTOs</h5>
+                <p class="text-sm">Transferencia de datos entre capas</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arrow">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+
+          <!-- Capa de Dominio -->
+          <div class="layer bg-purple-100">
+            <h4 class="font-semibold text-purple-800 text-lg mb-3">
+              Capa de Dominio
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="component bg-white">
+                <h5 class="font-semibold">Entidades</h5>
+                <p class="text-sm">Modelos de negocio centrales</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Interfaces de Repositorio</h5>
+                <p class="text-sm">Contratos para persistencia</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Servicios de Dominio</h5>
+                <p class="text-sm">Lógica central de negocio</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="arrow">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+
+          <!-- Capa de Infraestructura -->
+          <div class="layer bg-red-100">
+            <h4 class="font-semibold text-red-800 text-lg mb-3">
+              Capa de Infraestructura
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="component bg-white">
+                <h5 class="font-semibold">Entity Framework 6</h5>
+                <p class="text-sm">Implementación de persistencia</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Servicios Externos</h5>
+                <p class="text-sm">Integración con APIs de mapas</p>
+              </div>
+              <div class="component bg-white">
+                <h5 class="font-semibold">Servicios de Email</h5>
+                <p class="text-sm">Comunicación con clientes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Casos de Uso -->
+      <section id="casos-uso" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          6. Casos de Uso
+        </h2>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">
+          6.1 Actores del Sistema
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-blue-50 p-4 rounded-lg text-center">
+            <i class="fas fa-user-cog text-blue-600 text-2xl mb-2"></i>
+            <h4 class="font-semibold">Administrador</h4>
+            <p class="text-sm">Gestión completa del sistema</p>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg text-center">
+            <i class="fas fa-user-tie text-green-600 text-2xl mb-2"></i>
+            <h4 class="font-semibold">Planificador</h4>
+            <p class="text-sm">Gestión de programación y rutas</p>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg text-center">
+            <i class="fas fa-truck text-purple-600 text-2xl mb-2"></i>
+            <h4 class="font-semibold">Transportista</h4>
+            <p class="text-sm">Consulta de rutas asignadas</p>
+          </div>
+          <div class="bg-yellow-50 p-4 rounded-lg text-center">
+            <i class="fas fa-building text-yellow-600 text-2xl mb-2"></i>
+            <h4 class="font-semibold">Planta/Cliente</h4>
+            <p class="text-sm">Consulta de entregas programadas</p>
+          </div>
+        </div>
+
+        <h3
+          class="text-xl font-semibold text-gray-700 mb-4 mt-8 flex items-center"
+        >
+          <i class="fas fa-diagram-project mr-2 text-blue-600"></i> 6.2 Diagrama
+          de Casos de Uso
+        </h3>
+        <div
+          class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-gray-200 mb-6"
+        >
+          <div class="bg-white p-2 rounded-lg shadow-inner">
+            <img
+              src="diagrama-01.jpg"
+              alt="Diagrama de Casos de Uso del Sistema"
+              class="w-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+            />
+          </div>
+          <p class="text-center text-gray-600 mt-3 text-sm font-medium">
+            Figura 1: Diagrama de casos de uso del sistema de distribución de
+            combustibles
+          </p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4 mt-8">
+          6.3 Descripción Detallada de Casos de Uso
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="use-case-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre del Caso de Uso</th>
+                <th>Actor Principal</th>
+                <th>Descripción</th>
+                <th>Precondiciones</th>
+                <th>Flujo Principal</th>
+                <th>Postcondiciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CU-01</td>
+                <td>Gestionar Productos Disponibles</td>
+                <td>Administrador</td>
+                <td>
+                  Permite registrar y actualizar los productos disponibles para
+                  distribución mensual
+                </td>
+                <td>Inicio de sesión</td>
+                <td>
+                  1. El administrador accede al módulo de productos<br />2.
+                  Ingresa las cantidades disponibles de cada producto<br />3.
+                  Guarda la información
+                </td>
+                <td>
+                  Los productos disponibles quedan registrados en el sistema
+                </td>
+              </tr>
+              <tr>
+                <td>CU-02</td>
+                <td>Registrar Requerimientos de Clientes</td>
+                <td>Administrador</td>
+                <td>
+                  Ingresar las solicitudes de productos de todos los clientes
+                </td>
+                <td>Iniciado de sesión</td>
+                <td>
+                  1. El administrador accede al módulo de clientes<br />2.
+                  Selecciona el cliente en el mapa<br />3. Ingresa los productos
+                  y cantidades solicitadas<br />4. Guarda la información
+                </td>
+                <td>Los requerimientos de los clientes quedan registrados</td>
+              </tr>
+              <tr>
+                <td>CU-03</td>
+                <td>Planificar Distribución Mensual</td>
+                <td>Administrador</td>
+                <td>Programa las rutas más optimas y menos costosas</td>
+                <td>Iniciado de sesión</td>
+                <td>
+                  1. El administrador accede al módulo de programacion<br />2.
+                  Clic en optimizar rutas<br />3. Clic en modificar ruta<br />4.
+                  Guarda la información
+                </td>
+                <td>La programacion mensual queda registrada</td>
+              </tr>
+              <tr>
+                <td>CU-04</td>
+                <td>Modificación de las rutas Diarias</td>
+                <td>Administrador</td>
+                <td>Permite modificar una ruta o múltiples rutas por día</td>
+                <td>Existe una planificación mensual aprobada</td>
+                <td>
+                  1. El planificador accede a la programación diaria<br />2.
+                  Selecciona un cliente y producto<br />3. Selecciona la ruta de
+                  transporte<br />4. Guarda la programación
+                </td>
+                <td>Se modifica una ruta programada anteriormente</td>
+              </tr>
+              <!-- <tr>
+                <td>CU-05</td>
+                <td>Visualizar Rutas en Mapa</td>
+                <td>Planificador, Transportista</td>
+                <td>
+                  Muestra las rutas de distribución en un mapa interactivo
+                </td>
+                <td>
+                  El usuario ha iniciado sesión y existen rutas programadas
+                </td>
+                <td>
+                  1. El usuario accede al módulo de mapas<br />2. Selecciona un
+                  rango de fechas<br />3. El sistema muestra las rutas en el
+                  mapa<br />4. El usuario puede hacer clic en una ruta para ver
+                  detalles
+                </td>
+                <td>Se visualizan las rutas en el mapa</td>
+              </tr>
+              <tr>
+                <td>CU-06</td>
+                <td>Generar Reportes de Distribución</td>
+                <td>Planificador</td>
+                <td>
+                  Permite generar reportes de distribución mensual y diaria
+                </td>
+                <td>El planificador ha iniciado sesión</td>
+                <td>
+                  1. El planificador accede al módulo de reportes<br />2.
+                  Selecciona el tipo de reporte y período<br />3. El sistema
+                  genera el reporte<br />4. El planificador puede exportar el
+                  reporte
+                </td>
+                <td>Se genera y muestra el reporte solicitado</td>
+              </tr>
+              <tr>
+                <td>CU-07</td>
+                <td>Consultar Entregas Programadas</td>
+                <td>Planta/Cliente</td>
+                <td>Permite a los clientes ver sus entregas programadas</td>
+                <td>El cliente ha iniciado sesión</td>
+                <td>
+                  1. El cliente accede a su portal<br />2. Selecciona la opción
+                  "Mis Entregas"<br />3. El sistema muestra las entregas
+                  programadas<br />4. El cliente puede filtrar por fecha o
+                  producto
+                </td>
+                <td>El cliente visualiza sus entregas programadas</td>
+              </tr>
+              <tr>
+                <td>CU-08</td>
+                <td>Notificar Cambios en Programación</td>
+                <td>Sistema</td>
+                <td>
+                  Envía notificaciones automáticas cuando hay cambios en la
+                  programación
+                </td>
+                <td>Se ha realizado un cambio en la programación</td>
+                <td>
+                  1. El sistema detecta un cambio en la programación<br />2.
+                  Identifica a los clientes afectados<br />3. Envía un correo
+                  electrónico con los detalles del cambio<br />4. Registra la
+                  notificación enviada
+                </td>
+                <td>Los clientes reciben notificaciones de los cambios</td>
+              </tr> -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- <h3 class="text-xl font-semibold text-gray-700 mb-4 mt-8">
+          6.4 Diagrama de Secuencia: Programación de Entregas
+        </h3>
+        <div class="sequence-diagram">
+          <div class="flex justify-between mb-6">
+            <div class="actor">Planificador</div>
+            <div class="system-component">Frontend</div>
+            <div class="system-component">Backend API</div>
+            <div class="system-component">Base de Datos</div>
+          </div>
+
+          <div class="interaction">
+            <p>1. El planificador selecciona "Programación de Entregas"</p>
+          </div>
+
+          <div class="interaction">
+            <p>
+              2. Frontend solicita datos de productos disponibles y clientes
+            </p>
+          </div>
+
+          <div class="interaction">
+            <p>3. Backend API consulta la base de datos</p>
+          </div>
+
+          <div class="interaction">
+            <p>4. Base de datos retorna la información</p>
+          </div>
+
+          <div class="interaction">
+            <p>5. Backend API envía los datos al frontend</p>
+          </div>
+
+          <div class="interaction">
+            <p>6. Frontend muestra el formulario de programación</p>
+          </div>
+
+          <div class="interaction">
+            <p>7. El planificador ingresa los datos de programación</p>
+          </div>
+
+          <div class="interaction">
+            <p>8. Frontend envía los datos al backend API</p>
+          </div>
+
+          <div class="interaction">
+            <p>9. Backend API valida y guarda los datos en la base de datos</p>
+          </div>
+
+          <div class="interaction">
+            <p>10. Backend API retorna confirmación</p>
+          </div>
+
+          <div class="interaction">
+            <p>11. Frontend muestra mensaje de éxito</p>
+          </div>
+        </div> -->
+      </section>
+
+      <!-- Modelo de Datos -->
+      <section id="modelo-datos" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          7. Modelo de Datos
+        </h2>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">
+          7.1 Diagrama Entidad-Relación
+        </h3>
+        <div
+          class="bg-gradient-to-br from-green-50 to-teal-50 p-6 rounded-xl border border-gray-200 mb-6"
+        >
+          <div class="bg-white p-2 rounded-lg shadow-inner">
+            <img
+              src="diagrama-er.jpg"
+              alt="Diagrama Entidad-Relación"
+              class="w-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+            />
+          </div>
+          <p class="text-center text-gray-600 mt-3 text-sm font-medium">
+            Figura 2: Diagrama Entidad-Relación del sistema
+          </p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">
+          7.2 Descripción de Tablas Principales
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-green-50 p-5 rounded-lg">
+            <h4 class="font-semibold text-green-800 text-lg mb-3">
+              Tablas de Configuración
+            </h4>
+            <div class="db-table border-green-500">
+              <h5 class="font-semibold">Productos</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_producto (PK)</li>
+                <li>nombre</li>
+                <li>descripcion</li>
+                <li>unidad_medida</li>
+                <li>estado</li>
+              </ul>
+            </div>
+            <div class="db-table border-green-500">
+              <h5 class="font-semibold">Clientes</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_cliente (PK)</li>
+                <li>nombre</li>
+                <li>direccion</li>
+                <li>contacto</li>
+                <li>email</li>
+                <li>telefono</li>
+              </ul>
+            </div>
+            <div class="db-table border-green-500">
+              <h5 class="font-semibold">Rutas</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_ruta (PK)</li>
+                <li>nombre</li>
+                <li>descripcion</li>
+                <li>tipo_transporte</li>
+                <li>distancia_km</li>
+                <li>tiempo_estimado</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bg-blue-50 p-5 rounded-lg">
+            <h4 class="font-semibold text-blue-800 text-lg mb-3">
+              Tablas de Operación
+            </h4>
+            <div class="db-table border-blue-500">
+              <h5 class="font-semibold">Producto_Disponible</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_disponible (PK)</li>
+                <li>id_producto (FK)</li>
+                <li>cantidad</li>
+                <li>fecha_registro</li>
+                <li>mes</li>
+                <li>anio</li>
+              </ul>
+            </div>
+            <div class="db-table border-blue-500">
+              <h5 class="font-semibold">Requerimiento_Cliente</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_requerimiento (PK)</li>
+                <li>id_cliente (FK)</li>
+                <li>id_producto (FK)</li>
+                <li>cantidad_solicitada</li>
+                <li>fecha_solicitud</li>
+                <li>mes</li>
+                <li>anio</li>
+              </ul>
+            </div>
+            <div class="db-table border-blue-500">
+              <h5 class="font-semibold">Programacion_Mensual</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_programacion_mensual (PK)</li>
+                <li>id_cliente (FK)</li>
+                <li>id_producto (FK)</li>
+                <li>cantidad_asignada</li>
+                <li>mes</li>
+                <li>anio</li>
+                <li>estado</li>
+              </ul>
+            </div>
+            <div class="db-table border-blue-500">
+              <h5 class="font-semibold">Programacion_Diaria</h5>
+              <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>id_programacion_diaria (PK)</li>
+                <li>id_programacion_mensual (FK)</li>
+                <li>id_ruta (FK)</li>
+                <li>cantidad</li>
+                <li>fecha_entrega</li>
+                <li>estado</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seguridad -->
+      <section id="seguridad" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          8. Seguridad
+        </h2>
+
+        <div
+          class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-lg mb-6"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="font-semibold text-indigo-700 text-lg mb-3">
+                Medidas de Seguridad
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-user-lock text-indigo-600"></i>
+                  </div>
+                  <span>Autenticación con JWT tokens</span>
+                </li>
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-user-tag text-indigo-600"></i>
+                  </div>
+                  <span>Autorización basada en roles</span>
+                </li>
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-lock text-indigo-600"></i>
+                  </div>
+                  <span>Encriptación de datos sensibles</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="font-semibold text-indigo-700 text-lg mb-3">
+                Roles de Usuario
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-user-cog text-indigo-600"></i>
+                  </div>
+                  <span>Administrador - Acceso completo</span>
+                </li>
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-user-tie text-indigo-600"></i>
+                  </div>
+                  <span>Planificador - Gestión de programación</span>
+                </li>
+                <li class="flex items-center">
+                  <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-user text-indigo-600"></i>
+                  </div>
+                  <span>Consulta - Solo visualización</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">
+          8.1 Esquema de Seguridad
+        </h3>
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <span class="font-semibold">Autenticación:</span> Los usuarios
+              inician sesión con Google o correo electrónico y contraseña.
+            </li>
+            <li>
+              <span class="font-semibold">Autorización:</span> El sistema valida
+              los roles y permisos para cada operación.
+            </li>
+            <li>
+              <span class="font-semibold">Comunicación segura:</span> Todas las
+              comunicaciones entre frontend y backend utilizan HTTPS.
+            </li>
+            <li>
+              <span class="font-semibold">Protección de datos:</span> La
+              información sensible se encripta en la base de datos.
+            </li>
+            <li>
+              <span class="font-semibold">Auditoría:</span> Se registran todas
+              las acciones críticas del sistema.
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Estrategia de Despliegue -->
+      <section id="despliegue" class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-blue-800 border-b pb-2">
+          9. Estrategia de Despliegue
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-blue-50 p-5 rounded-lg">
+            <h3 class="font-semibold text-blue-800 text-lg mb-3">Entornos</h3>
+            <ul class="list-disc pl-5 space-y-2">
+              <li>Desarrollo - Servidores locales</li>
+              <li>Pruebas - Entorno aislado con datos de prueba</li>
+              <li>
+                Producción - Servidores corporativos con alta disponibilidad
+              </li>
+            </ul>
+          </div>
+
+          <div class="bg-green-50 p-5 rounded-lg">
+            <h3 class="font-semibold text-green-800 text-lg mb-3">
+              Base de Datos
+            </h3>
+            <ul class="list-disc pl-5 space-y-2">
+              <li>SQL Server</li>
+              <li>Copias de seguridad automáticas</li>
+              <li>Replicación para alta disponibilidad</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-700 mb-4 mt-6">
+          9.1 Arquitectura de Despliegue
+        </h3>
+        <div class="bg-gray-100 p-6 rounded-lg mb-6">
+          <div class="flex flex-col items-center">
+            <div class="bg-white p-4 rounded-lg shadow-md mb-4 w-full max-w-md">
+              <h4 class="font-semibold text-center mb-2">
+                Frontend (Blazor WASM)
+              </h4>
+              <p class="text-sm text-center">
+                Alojado en servidor web estático
+              </p>
+            </div>
+            <div class="text-2xl text-gray-500 mb-4">↓</div>
+            <div class="bg-white p-4 rounded-lg shadow-md mb-4 w-full max-w-md">
+              <h4 class="font-semibold text-center mb-2">
+                Backend (ASP.NET Core API)
+              </h4>
+              <p class="text-sm text-center">
+                Alojado en servidor de aplicaciones
+              </p>
+            </div>
+            <div class="text-2xl text-gray-500 mb-4">↓</div>
+            <div class="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+              <h4 class="font-semibold text-center mb-2">
+                Base de Datos (SQL Server)
+              </h4>
+              <p class="text-sm text-center">Servidor de bases de datos</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="bg-gray-100 p-6 rounded-lg">
+          <h4 class="font-semibold text-gray-700 mb-3">
+            Plan de Implementación
+          </h4>
+          <p class="text-gray-600">
+            Se implementará un plan por fases, comenzando con los módulos
+            administrativos, seguido del módulo de programación y finalmente la
+            visualización en mapas y reportes.
+          </p>
+        </div> -->
+      </section>
+
+      <!-- Conclusión -->
+      <!-- <section
+        class="bg-gradient-to-r from-blue-100 to-indigo-100 p-8 rounded-xl border-l-4 border-blue-500"
+      >
+        <h2 class="text-2xl font-semibold text-blue-800 mb-4">
+          Resumen de la Arquitectura
+        </h2>
+        <p class="text-lg mb-6">
+          La arquitectura propuesta para el Sistema de Gestión de Distribución
+          de Combustibles se basa en una estructura en capas con Blazor
+          WebAssembly como tecnología principal, aprovechando las ventajas de
+          .NET Core 8 y Entity Framework para crear una solución escalable,
+          mantenible y segura que reemplace los procesos manuales actuales
+          basados en Excel.
+        </p>
+
+        <div class="flex items-center bg-white p-4 rounded-lg shadow-sm">
+          <div class="bg-green-100 p-3 rounded-full mr-4">
+            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold">Próximos Pasos</h3>
+            <p>
+              Desarrollo de diagramas detallados de secuencia y componentes,
+              definición de APIs y establecimiento de métricas de rendimiento.
+            </p>
+          </div>
+        </div>
+      </section> -->
+    </div>
+  </body>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Exportar a PDF
+      document
+        .getElementById("exportPdf")
+        .addEventListener("click", function () {
+          const element = document.getElementById("content-to-export");
+          const options = {
+            margin: 10,
+            filename: "Documento_Arquitectura_Sistema_Distribucion.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          };
+
+          html2pdf().set(options).from(element).save();
+        });
+
+      // Exportar a Word
+      document
+        .getElementById("exportWord")
+        .addEventListener("click", function () {
+          const element = document.getElementById("content-to-export");
+          const content = element.innerHTML;
+
+          // Crear documento Word
+          const converted =
+            html -
+            docx.asBlob(content, {
+              orientation: "portrait",
+              margins: { top: 720, right: 720, bottom: 720, left: 720 },
+            });
+
+          saveAs(converted, "Documento_Arquitectura_Sistema_Distribucion.docx");
+        });
+    });
+  </script>
+</html>
