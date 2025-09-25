@@ -1,0 +1,1 @@
+ALTER USER usr_silog WITH LOGIN = usr_silog;
